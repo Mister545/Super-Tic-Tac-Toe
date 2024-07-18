@@ -32,12 +32,12 @@ class MainActivity : AppCompatActivity() {
 
         // Виклик початкових методів
         initialization()
-        updatedList()
+//        updatedList()
 
         // Отримання початкового кроку з БД та ініціалізація xOrO
 
         binding.buttonReset.setOnClickListener {
-            resetGame()
+        initialization()
         }
     }
 
@@ -58,8 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     // Оновлення дошки при натисканні кнопки
     private fun updateBoard(index: Int, button: Button) {
-        firebaseService.getBoardState {listBD->
-            firebaseService.getStep {step->
+        firebaseService.getBoardState {listBD, step->
                 if (listBD[index] == 0) {
                     val currentPlayer = if (step) 1 else 2
                     firebaseService.setStep(!step)
@@ -69,7 +68,6 @@ class MainActivity : AppCompatActivity() {
                     firebaseService.setBoardState(listBD)
                     checkGameStatus()
                     gameBoard.switchPlayer()
-                }
             }
         }
     }
@@ -88,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Win $player", Toast.LENGTH_LONG).show()
         firebaseService.setWin(winCode)
         replaceFragment(win_fragment())
-        resetGame()
     }
 
     // Обробка нічиї
@@ -96,19 +93,17 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "DRAW", Toast.LENGTH_LONG).show()
         firebaseService.setWin(0)
         replaceFragment(win_fragment())
-        resetGame()
     }
 
     // Скидання гри до початкового стану
     private fun resetGame() {
 
-        firebaseService.getStep { step ->
+        firebaseService.getBoardState() { board, step ->
             gameBoard.switchPlayer()
-            if (!step) gameBoard.switchPlayer()  // Якщо крок false, перемикаємо гравця
+            if (!step) gameBoard.switchPlayer()
         }
 
-        gameBoard.resetBoard()
-        firebaseService.setStepX()
+        gameBoard.resetBoard() //
         firebaseService.setBoardState(gameBoard.getBoardState())
         buttonArr.forEach { it.setBackgroundResource(R.drawable.white_background) }
     }
@@ -123,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     // Оновлення списку з бази даних
     private fun updatedList() {
-        firebaseService.getBoardState { mutable ->
+        firebaseService.getBoardState { mutable, step ->
             for ((index, button) in buttonArr.withIndex()) {
                 when (mutable[index]) {
                     1 -> button.setBackgroundResource(R.drawable.x)

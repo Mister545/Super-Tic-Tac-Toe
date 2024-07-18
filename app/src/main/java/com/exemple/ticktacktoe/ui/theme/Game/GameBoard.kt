@@ -3,7 +3,6 @@ package com.exemple.ticktacktoe
 class GameBoard {
     private var xOrO: Boolean = true
     private var arr: MutableList<Int> = MutableList(9) { 0 }
-
     fun getCurrentPlayer(): Boolean {
         return xOrO
     }
