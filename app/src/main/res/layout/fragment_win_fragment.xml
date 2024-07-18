@@ -13,15 +13,19 @@
         android:id="@+id/bExitFragWin"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:layout_marginStart="2dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="132dp"
         android:background="@color/green"
         android:backgroundTint="@color/green"
         android:gravity="right"
         android:text="X"
         android:textAlignment="center"
         android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tWinFrag"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
