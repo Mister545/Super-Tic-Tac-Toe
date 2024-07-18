@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
             if (!step) gameBoard.switchPlayer()
         }
 
+//        jdffv
         gameBoard.resetBoard() //
         firebaseService.setBoardState(gameBoard.getBoardState())
         buttonArr.forEach { it.setBackgroundResource(R.drawable.white_background) }
