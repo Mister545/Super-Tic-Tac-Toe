@@ -2,10 +2,12 @@ package com.exemple.ticktacktoe.ui.theme.Game
 
 
 import android.util.Log
+import com.exemple.ticktacktoe.GameBoard
 import com.google.android.gms.dynamic.IFragmentWrapper
 import com.google.firebase.database.*
 
 class FirebaseService {
+
     private val database = FirebaseDatabase.getInstance()
 
     fun setStepX() {
@@ -28,7 +30,8 @@ class FirebaseService {
                 }
             })
     }
-    private fun step(list: MutableList<Int>) : Boolean {
+    fun step(list: MutableList<Int>) : Boolean {
+        Log.d("ooo", "list==========$list")
         var x = 0
         var o = 0
         var y = 0
@@ -41,7 +44,7 @@ class FirebaseService {
                 o++
             }
         }
-        return when {
+        val ret = when {
             y == 0 -> true
             y == 3 -> true
             y == 5 -> true
@@ -50,6 +53,7 @@ class FirebaseService {
             y == 12 -> true
             else -> false
         }
+        return ret
     }
 
     fun setBoardState(arr: MutableList<Int>) {
@@ -57,19 +61,28 @@ class FirebaseService {
     }
 
     fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
-        database.getReference("Stat/Place")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val t = object : GenericTypeIndicator<MutableList<Int>>() {}
-                    val list = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-                    callback(list, step(list))
-                }
+        val databaseReference = database.getReference("Stat/Place")
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
+                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
+                val gameStatus = step(boardState)
 
-                override fun onCancelled(error: DatabaseError) {
-                    callback(MutableList(9) { 0 }, false)
-                }
-            })
+                callback(boardState, gameStatus)
+
+                // Додайте логування
+//                Log.d("ooo", "Data received: $boardState")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(MutableList(9) { 0 }, false)
+
+                // Логування помилки
+                Log.e("ooo", "Error: ${error.message}")
+            }
+        })
     }
+
 
     fun setWin(win: Int) {
         database.getReference("Stat").child("win").setValue(win)
