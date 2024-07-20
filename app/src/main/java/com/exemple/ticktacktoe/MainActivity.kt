@@ -62,31 +62,19 @@ class MainActivity : AppCompatActivity() {
                 val currentPlayer = if (step) 1 else 2
                 listBD[index] = currentPlayer
                 firebaseService.setStep(!step)
-
                 button.setBackgroundResource(if (step) R.drawable.x else R.drawable.o)
-
                 firebaseService.setBoardState(listBD)
-//                checkGameStatus()
-                gameBoard.switchPlayer()
             }
         }
     }
 
-//    private fun checkGameStatus() {
-//        when {
-//            gameBoard.checkWin(1) -> handleWin("X", 1)
-//            gameBoard.checkWin(2) -> handleWin("O", 2)
-//            gameBoard.isDraw() -> handleDraw()
-//        }
-//    }
-
-    fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
+    private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
         val databaseReference = database.getReference("Stat/Place")
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-                val gameStatus = firebaseService.step(boardState)
+                val gameStatus = firebaseService.getStep(boardState)
                 gameBoard.updateBoardAll(boardState, buttonArr, binding)
 
                 callback(boardState, gameStatus)
@@ -107,7 +95,6 @@ class MainActivity : AppCompatActivity() {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
                 updateUI(boardState)
-//                checkGameStatus()
                 when {
                     gameBoard.checkWin(1, boardState) -> handleWin("X", 1)
                     gameBoard.checkWin(2, boardState) -> handleWin("O", 2)
@@ -129,7 +116,6 @@ class MainActivity : AppCompatActivity() {
                 else -> button.setBackgroundResource(R.drawable.white_background)
             }
         }
-//        checkGameStatus()
     }
 
     private fun handleWin(player: String, winCode: Int) {
@@ -145,11 +131,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetGame() {
-        firebaseService.getBoardState { board, step ->
-            gameBoard.switchPlayer()
-            if (!step) gameBoard.switchPlayer()
-        }
-
         gameBoard.resetBoard()
         firebaseService.setBoardState(gameBoard.getBoardState())
         buttonArr.forEach { it.setBackgroundResource(R.drawable.white_background) }

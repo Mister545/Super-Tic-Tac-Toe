@@ -6,15 +6,8 @@ import com.exemple.ticktacktoe.databinding.ActivityMainBinding
 
 class GameBoard {
 
-    private var xOrO: Boolean = true
     private var arr: MutableList<Int> = MutableList(9) { 0 }
-    fun getCurrentPlayer(): Boolean {
-        return xOrO
-    }
 
-    fun switchPlayer() {
-        xOrO = !xOrO
-    }
 
     fun getBoardState(): MutableList<Int> {
         return arr
