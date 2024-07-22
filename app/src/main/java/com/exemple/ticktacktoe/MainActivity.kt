@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         initialization()
+        replaceFragment(super_ticTacToe())
 
         binding.buttonReset.setOnClickListener {
             initialization()
