@@ -1,8 +1,10 @@
 // MainActivity.kt
 package com.exemple.ticktacktoe
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var buttonArr: List<Button>
     private val gameBoard = GameBoard()
-    private val firebaseService = FirebaseService()
+    val firebaseService = FirebaseService()
     private val database = FirebaseDatabase.getInstance()
 
     override fun onCreate(s: Bundle?) {
@@ -36,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         initialization()
-        replaceFragment(super_ticTacToe())
+        replaceFragment(SuperTicTacToe())
 
         binding.buttonReset.setOnClickListener {
             initialization()
@@ -60,11 +62,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateBoard(index: Int, button: Button) {
         getBoardState { listBD, step ->
             if (listBD[index] == 0) {
-                val currentPlayer = if (step) 1 else 2
+                val currentPlayer = if (step) 2 else 1
                 listBD[index] = currentPlayer
                 firebaseService.setStep(!step)
                 button.setBackgroundResource(if (step) R.drawable.x else R.drawable.o)
-                firebaseService.setBoardState(listBD)
+                firebaseService.setBoardStateSimple(listBD)
             }
         }
     }
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
                 val gameStatus = firebaseService.getStep(boardState)
-                gameBoard.updateBoardAll(boardState, buttonArr, binding)
+                gameBoard.updateBoardAllSimple(boardState, buttonArr)
 
                 callback(boardState, gameStatus)
             }
@@ -132,8 +134,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resetGame() {
-        gameBoard.resetBoard()
-        firebaseService.setBoardState(gameBoard.getBoardState())
+        gameBoard.resetBoardSimple()
+        firebaseService.setBoardStateSimple(gameBoard.getBoardState())
         buttonArr.forEach { it.setBackgroundResource(R.drawable.white_background) }
     }
 
@@ -142,5 +144,7 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(binding.fragmentConteiner.id, fragment)
         fragmentTransaction.commit()
+        binding.buttonReset.visibility = View.GONE
+        binding.TicTacToeText.visibility = View.GONE
     }
 }
