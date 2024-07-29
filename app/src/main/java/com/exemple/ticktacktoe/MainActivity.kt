@@ -1,7 +1,6 @@
 // MainActivity.kt
 package com.exemple.ticktacktoe
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -25,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     val firebaseService = FirebaseService()
     private val database = FirebaseDatabase.getInstance()
 
-    override fun onCreate(s: Bundle?) {
-        super.onCreate(s)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -38,7 +37,10 @@ class MainActivity : AppCompatActivity() {
         )
 
         initialization()
-        replaceFragment(SuperTicTacToe())
+
+        binding.bSuper.setOnClickListener {
+            replaceFragment(SuperTicTacToe())
+        }
 
         binding.buttonReset.setOnClickListener {
             initialization()

@@ -1,8 +1,6 @@
 package com.exemple.ticktacktoe
 
-import android.util.Log
 import android.widget.Button
-import com.exemple.ticktacktoe.databinding.ActivityMainBinding
 
 class GameBoard {
 
