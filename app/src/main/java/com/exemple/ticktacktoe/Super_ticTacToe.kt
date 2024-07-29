@@ -55,16 +55,16 @@ class SuperTicTacToe : DialogFragment() {
     }
 
     private fun initialization() {
-        firebaseService.setNextBoard(0)
+        firebaseService.setNextBoard(10)
         setupButtonListeners()
         resetGame()
-        setupFirebaseListener()
+        setupFirebaseListenerAndChecker()
     }
 
     private fun setupButtonListeners() {
         firebaseService.getNextBoard { nextBoard ->
             disableAllButtons()
-            if (nextBoard == 0) {
+            if (nextBoard == 10) {
                 buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
             } else {
                 enableBoardButtons(nextBoard)
@@ -115,13 +115,14 @@ class SuperTicTacToe : DialogFragment() {
         })
     }
 
-    private fun setupFirebaseListener() {
+    private fun setupFirebaseListenerAndChecker() {
         val databaseReference = database.getReference("Stat/Board/Super")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { MutableList(9) {0}}
                 updateUI(boardState)
+                gameBoard.checkWinSuper(boardState, binding)
             }
 
             override fun onCancelled(error: DatabaseError) {

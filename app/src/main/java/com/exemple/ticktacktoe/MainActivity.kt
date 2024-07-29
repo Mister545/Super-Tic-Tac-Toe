@@ -72,6 +72,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun disableAllButtons() {
+        buttonArr.forEach { it.isClickable = false }
+    }
 
     private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
         val databaseReference = database.getReference("Stat/Place")
@@ -148,5 +151,7 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.commit()
         binding.buttonReset.visibility = View.GONE
         binding.TicTacToeText.visibility = View.GONE
+        binding.bSuper.visibility = View.GONE
+        disableAllButtons()
     }
 }

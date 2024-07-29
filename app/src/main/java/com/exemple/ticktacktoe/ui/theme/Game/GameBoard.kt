@@ -1,10 +1,13 @@
 package com.exemple.ticktacktoe
 
+import android.util.Log
 import android.widget.Button
+import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
 
 class GameBoard {
 
     private var arrSimple: MutableList<Int> = MutableList(9) { 0 }
+    private var winListSuper: MutableList<Int> = MutableList(9) { 0 }
     private var arrSuper: MutableList<MutableList<Int>> = MutableList(9) { MutableList(9) { 0 } }
 
 
@@ -20,6 +23,21 @@ class GameBoard {
         arrSimple[index] = player
     }
 
+    fun checkWinSuper(boardState: MutableList<MutableList<Int>>, binding: FragmentSuperTicTacToeBinding){
+        boardState.forEachIndexed { indexI, i ->
+            when {
+                checkWin(1, i) -> winListSuper[indexI] = 1
+                checkWin(2, i) -> winListSuper[indexI] = 2
+                isDraw(i) -> winListSuper[indexI] = 3
+            }
+            when {
+                checkWin(1, winListSuper) -> binding.TextWin.text = "Win X"
+                checkWin(2, winListSuper) -> binding.TextWin.text = "Win O"
+                isDraw(winListSuper) -> binding.TextWin.text = "Draw"
+            }
+            Log.d("ooo", "List=======$winListSuper")
+        }
+    }
 
     fun updateBoardAllSimple(array: MutableList<Int>, buttonArr: List<Button>) {
 
@@ -56,6 +74,16 @@ class GameBoard {
     }
 
     fun checkWin(player: Int, array: MutableList<Int>): Boolean {
+        val winConditions = arrayOf(
+            intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
+            intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
+            intArrayOf(0, 4, 8), intArrayOf(2, 4, 6)
+        )
+        return winConditions.any { condition ->
+            condition.all { array[it] == player }
+        }
+    }
+    fun checkWinSuper(player: Int, array: MutableList<Int>): Boolean {
         val winConditions = arrayOf(
             intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
             intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
