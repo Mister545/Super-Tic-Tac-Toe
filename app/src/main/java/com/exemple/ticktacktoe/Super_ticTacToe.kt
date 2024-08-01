@@ -2,10 +2,12 @@ package com.exemple.ticktacktoe
 
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
 import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
@@ -40,9 +42,7 @@ class SuperTicTacToe : DialogFragment() {
         initialization()
 
         binding.resetSuper.setOnClickListener{
-            firebaseService.setNextBoard(10)
-            setupButtons()
-            initialization()
+            dismiss()
         }
     }
 
@@ -66,29 +66,37 @@ class SuperTicTacToe : DialogFragment() {
         resetGame()
         setupFirebaseListenerAndChecker()
     }
-    private fun setStoke(board: MutableList<MutableList<Int>>) {
-        firebaseService.getNextBoard { nextBoardIndex ->
-            if (nextBoardIndex == 10) {
-                board.forEachIndexed { index, i ->
-                    for (j in nextField(nextBoardIndex, gameBoard.getWinListSuper())) {
-                        Log.d("ooo", "jjjjjjjjj ======== $j")
-                        gameBoard.setStrokeOnButtonGreen(
-                            buttonArrWithArr[j][index],
+    private fun setStoke() {
+        getBoardState { board, step ->
+            firebaseService.getNextBoard { nextBoardIndex ->
+                for (i in board.indices) {
+                    for (j in board[i].indices) {
+                        gameBoard.setStrokeOnButtonBlack(
+                            buttonArrWithArr[i][j],
                             requireContext()
                         )
                     }
                 }
-            } else {
-                for (i in board.indices) {
-                    for (j in board[i].indices) {
-                        gameBoard.setStrokeOnButtonBlack(buttonArrWithArr[i][j], requireContext())
+
+                if (nextBoardIndex == 10) {
+                    board.forEachIndexed { index, i ->
+                        for (j in nextField(nextBoardIndex)) {
+                            Log.d("ooo", "jjjjjjjjj ======== $j")
+                            gameBoard.setStrokeOnButtonGreen(
+                                buttonArrWithArr[j][index],
+                                requireContext()
+                            )
+                        }
                     }
-                }
-                for (i in board[nextBoardIndex].indices) {
-                    gameBoard.setStrokeOnButtonGreen(
-                        buttonArrWithArr[nextBoardIndex][i],
-                        requireContext()
-                    )
+                } else {
+                    board.forEachIndexed { index, i ->
+                        for (j in nextField(nextBoardIndex)) {
+                            gameBoard.setStrokeOnButtonGreen(
+                                buttonArrWithArr[j][index],
+                                requireContext()
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -98,7 +106,6 @@ class SuperTicTacToe : DialogFragment() {
     private fun setupButtonListeners() {
         firebaseService.getNextBoard { nextBoard ->
             disableAllButtons()
-            firebaseService.setNextField(nextField(nextBoard, gameBoard.getWinListSuper()))
             if(gameBoard.checkRightPlace(nextBoard)){
                 disableBoardWinner(nextBoard)
                 firebaseService.setNextBoard(10)
@@ -109,11 +116,13 @@ class SuperTicTacToe : DialogFragment() {
             } else {
                 enableBoardButtons(nextBoard)
             }
+            firebaseService.setNextField(nextField(nextBoard))
         }
+        setStoke()
     }
-    private fun nextField(nextBoard: Int, winListSuper: MutableList<Int>):MutableList<Int>{
+    private fun nextField(nextBoard: Int):MutableList<Int>{
         val arr= mutableListOf(0,1,2,3,4,5,6,7,8)
-
+        val winListSuper = gameBoard.getWinListSuper()
         return if (nextBoard == 10 || prevStepInWinListSuper(nextBoard, winListSuper)) {
             winListSuper.forEachIndexed { index, i ->
                 if (i != 0)
@@ -173,7 +182,6 @@ class SuperTicTacToe : DialogFragment() {
                 val t = object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { MutableList(9) { 0 } }
                 val gameStatus = firebaseService.getStepSuper(boardState)
-                setStoke(boardState)
                 callback(boardState, gameStatus)
             }
 
@@ -217,16 +225,16 @@ class SuperTicTacToe : DialogFragment() {
         buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(it)}
     }
 
-//    private fun handleWin(player: String, winCode: Int) {
-//        binding.TextWin.text = "Win $player"
-//        binding.TextWin.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-//        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
-//        firebaseService.setWin(winCode)
-//    }
+    private fun handleWin(player: String, winCode: Int) {
+        binding.TextWin.text = "Win $player"
+        binding.TextWin.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
+        firebaseService.setWin(winCode)
+    }
 
-//    private fun handleDraw() {
-//        binding.TextWin.text = "Draw"
-//        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
-//        firebaseService.setWinSuper(0)
-//    }
+    private fun handleDraw() {
+        binding.TextWin.text = "Draw"
+        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
+        firebaseService.setWinSuper(0)
+    }
 }

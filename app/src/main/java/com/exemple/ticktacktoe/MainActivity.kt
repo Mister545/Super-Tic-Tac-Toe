@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         setupButtonListeners()
         setupFirebaseListener()  // Налаштування постійного слухача змін
     }
-
     private fun setupButtonListeners() {
         for ((index, button) in buttonArr.withIndex()) {
             button.setOnClickListener {
@@ -77,6 +76,9 @@ class MainActivity : AppCompatActivity() {
     }
     private fun disableAllButtons() {
         buttonArr.forEach { it.isClickable = false }
+    }
+    private fun enableAllButtons() {
+        buttonArr.forEach { it.isClickable = true }
     }
 
     private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
@@ -156,5 +158,11 @@ class MainActivity : AppCompatActivity() {
         binding.TicTacToeText.visibility = View.GONE
         binding.bSuper.visibility = View.GONE
         disableAllButtons()
+    }
+    private fun comeBack(){
+        binding.buttonReset.visibility = View.VISIBLE
+        binding.TicTacToeText.visibility = View.VISIBLE
+        binding.bSuper.visibility = View.VISIBLE
+        enableAllButtons()
     }
 }
