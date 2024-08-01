@@ -43,13 +43,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.buttonReset.setOnClickListener {
-            initialization()
+            binding.tableLayout.setBackgroundResource(R.color.black)
         }
+
+
     }
 
     private fun initialization() {
-        setupButtonListeners()
+        firebaseService.setStep(true)
         resetGame()
+        setupButtonListeners()
         setupFirebaseListener()  // Налаштування постійного слухача змін
     }
 
@@ -64,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateBoard(index: Int, button: Button) {
         getBoardState { listBD, step ->
             if (listBD[index] == 0) {
-                val currentPlayer = if (step) 2 else 1
+                val currentPlayer = if (step) 1 else 2
                 listBD[index] = currentPlayer
                 firebaseService.setStep(!step)
                 button.setBackgroundResource(if (step) R.drawable.x else R.drawable.o)
@@ -77,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
-        val databaseReference = database.getReference("Stat/Place")
+        val databaseReference = database.getReference("StatSimple/data")
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
@@ -97,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFirebaseListener() {
-        val databaseReference = database.getReference("Stat/Place")
+        val databaseReference = database.getReference("StatSimple/data")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
@@ -121,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             when (boardState[index]) {
                 1 -> button.setBackgroundResource(R.drawable.x)
                 2 -> button.setBackgroundResource(R.drawable.o)
-                else -> button.setBackgroundResource(R.drawable.white_background)
+                else -> gameBoard.setBackgroundButtons(button)
             }
         }
     }
@@ -141,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetGame() {
         gameBoard.resetBoardSimple()
         firebaseService.setBoardStateSimple(gameBoard.getBoardState())
-        buttonArr.forEach { it.setBackgroundResource(R.drawable.white_background) }
+        buttonArr.forEach { gameBoard.setBackgroundButtons(it) }
     }
 
     private fun replaceFragment(fragment: Fragment) {

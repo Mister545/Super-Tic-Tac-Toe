@@ -9,10 +9,10 @@ class FirebaseService {
 
 
     fun setStep(step: Boolean) {
-        database.getReference("Stat").child("step").setValue(step)
+        database.getReference("StatSimple").child("isNextX").setValue(step)
     }
     fun setStepSuper(step: Boolean) {
-        database.getReference("Stat").child("Board/StepSuper").setValue(step)
+        database.getReference("Stat").child("isNextX").setValue(step)
     }
 
     fun getStep(list: MutableList<Int>) : Boolean {
@@ -59,8 +59,8 @@ class FirebaseService {
         return  y in validNum
     }
     fun getNextBoard(callback: (Int) -> Unit) {
-        val myRef = database.getReference("Stat/Board")
-        myRef.child("NextBoard").addValueEventListener(object : ValueEventListener {
+        val myRef = database.getReference("Stat")
+        myRef.child("prevStep").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val nextBoard = dataSnapshot.getValue(Int::class.java)!!
                 callback(nextBoard)
@@ -71,42 +71,46 @@ class FirebaseService {
             }
         })
     }
+    fun setNextField(field: MutableList<Int>){
+        database.getReference("Stat").child("nextField").setValue(field)
+    }
+
     fun setNextBoard(nextBoard : Int){
-        database.getReference("Stat/Board/NextBoard").setValue(nextBoard)
+        database.getReference("Stat/prevStep").setValue(nextBoard)
     }
 
     fun setBoardStateSimple(arr: MutableList<Int>) {
-        database.getReference("Stat").child("Place").setValue(arr)
+        database.getReference("StatSimple").child("data").setValue(arr)
     }
     fun setBoardStateSuper(arr: MutableList<MutableList<Int>>) {
-        database.getReference("Stat").child("Board/Super").setValue(arr)
+        database.getReference("Stat").child("data").setValue(arr)
     }
 
-//    fun getBoardStateAndStep(callback: (MutableList<Int>, Boolean) -> Unit) {
-//        val databaseReference = database.getReference("Stat/Place")
-//        databaseReference.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
-//                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-//                val gameStatus = getStep(boardState)
-//
-//                callback(boardState, gameStatus)
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                callback(MutableList(9) { 0 }, false)
-//
-//                // Логування помилки
-//                Log.e("ooo", "Error: ${error.message}")
-//            }
-//        })
-//    }
+    fun getBoardStateAndStep(callback: (MutableList<Int>, Boolean) -> Unit) {
+        val databaseReference = database.getReference("Stat/Place")
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
+                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
+                val gameStatus = getStep(boardState)
+
+                callback(boardState, gameStatus)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(MutableList(9) { 0 }, false)
+
+                // Логування помилки
+                Log.e("ooo", "Error: ${error.message}")
+            }
+        })
+    }
 
 
     fun setWin(win: Int) {
-        database.getReference("Stat").child("win").setValue(win)
+        database.getReference("StatSimple").child("winner").setValue(win)
     }
-//    fun setWinSuper(win: Int) {
-//        database.getReference("Stat").child("Board/WinSuper").setValue(win)
-//    }
+    fun setWinSuper(win: Int) {
+        database.getReference("Stat").child("Board/WinSuper").setValue(win)
+    }
 }

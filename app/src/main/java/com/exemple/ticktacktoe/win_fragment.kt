@@ -32,8 +32,8 @@ class win_fragment : DialogFragment() {
     }
 
     private fun getNumForWin() {
-        val myRef = database.getReference("Stat")
-        myRef.child("win").addListenerForSingleValueEvent(object : ValueEventListener {
+        val myRef = database.getReference("StatSimple")
+        myRef.child("winner").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val win = dataSnapshot.getValue(Int::class.java)
                 initialisationWin(win)

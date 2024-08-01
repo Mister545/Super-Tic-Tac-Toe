@@ -1,7 +1,13 @@
 package com.exemple.ticktacktoe
 
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.widget.Button
+
+import androidx.core.content.ContextCompat
+
 import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
 
 class GameBoard {
@@ -11,12 +17,68 @@ class GameBoard {
     private var arrSuper: MutableList<MutableList<Int>> = MutableList(9) { MutableList(9) { 0 } }
 
 
+    fun setBackgroundButtonsSuper(button: Button){
+        button.setBackgroundResource(R.drawable.button_background_tic_tac_toe)
+
+        val params = button.layoutParams
+        params.width = 30.dpToPx()
+        params.height = 30.dpToPx()
+        button.layoutParams = params
+
+//        val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
+//        layoutParams.setMargins(0.dpToPx(), 0.dpToPx(), 0.dpToPx(), 0.dpToPx()) // Значення в dp потрібно перетворити в px
+//        button.layoutParams = layoutParams
+    }
+    fun setBackgroundButtons(button: Button){
+        button.setBackgroundResource(R.drawable.button_background_tic_tac_toe)
+
+        val params = button.layoutParams
+        params.width = 100.dpToPx()
+        params.height = 100.dpToPx()
+        button.layoutParams = params
+//        setStrokeOnButton(button, Context)
+
+//        val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
+//        layoutParams.setMargins(3.dpToPx(), 3.dpToPx(), 3.dpToPx(), 3.dpToPx()) // Значення в dp потрібно перетворити в px
+//        button.layoutParams = layoutParams
+    }
+
+//    private fun con(button: Button){
+//        setStrokeOnButton(button, Context)
+//    }
+fun setStrokeOnButtonGreen(button: Button, context: Context) {
+    val background = button.background as? GradientDrawable
+    if (background != null) {
+        // Змінюємо ширину обведення (у пікселях)
+        val strokeWidth = context.resources.getDimensionPixelSize(R.dimen.new_stroke_width)
+        val strokeColor = ContextCompat.getColor(context, R.color.green)
+        background.setStroke(strokeWidth, strokeColor)
+    }
+}
+    fun setStrokeOnButtonBlack(button: Button, context: Context) {
+    val background = button.background as? GradientDrawable
+    if (background != null) {
+        // Змінюємо ширину обведення (у пікселях)
+        val strokeWidth = context.resources.getDimensionPixelSize(R.dimen.new_stroke_width)
+        val strokeColor = ContextCompat.getColor(context, R.color.black)
+        background.setStroke(strokeWidth, strokeColor)
+    }
+}
+
+
+
+    private fun Int.dpToPx(): Int {
+        return (this * Resources.getSystem().displayMetrics.density).toInt()
+    }
     fun getBoardState(): MutableList<Int> {
         return arrSimple
     }
 
     fun getBoardSuper(): MutableList<MutableList<Int>> {
         return arrSuper
+    }
+    fun getWinListSuper() : MutableList<Int>{
+        return winListSuper
     }
 
     fun updateBoardSimple(index: Int, player: Int) {
@@ -38,14 +100,20 @@ class GameBoard {
             Log.d("ooo", "List=======$winListSuper")
         }
     }
+    fun checkRightPlace(place : Int) : Boolean{
+        return if(place == 10)
+            false
+        else
+            winListSuper[place] == 1 || winListSuper[place] == 2 || winListSuper[place] == 3
+    }
 
     fun updateBoardAllSimple(array: MutableList<Int>, buttonArr: List<Button>) {
 
         array.forEachIndexed { index, element ->
             when (element) {
-                1 -> buttonArr[index].setBackgroundResource(R.drawable.x)
-                2 -> buttonArr[index].setBackgroundResource(R.drawable.o)
-                else -> buttonArr[index].setBackgroundResource(R.drawable.white_background)
+                1 -> buttonArr[index].text = "x"
+                2 -> buttonArr[index].text = "O"
+                else -> setBackgroundButtons(buttonArr[index])
             }
         }
     }
