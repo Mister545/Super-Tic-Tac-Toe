@@ -58,21 +58,10 @@ class FirebaseService {
             111, 114, 117, 120, 123)
         return  y in validNum
     }
-    fun getNextBoard(callback: (Int) -> Unit) {
-        val myRef = database.getReference("Stat")
-        myRef.child("prevStep").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val nextBoard = dataSnapshot.getValue(Int::class.java)!!
-                callback(nextBoard)
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                println("Помилка зчитування з Firebase: ${error.message}")
-            }
-        })
-    }
     fun setNextField(field: MutableList<Int>){
-        database.getReference("Stat").child("nextField").setValue(field)
+        val fieldInBd = field.filter { it != -1 }
+        database.getReference("Stat").child("nextField").setValue(fieldInBd)
     }
 
     fun setNextBoard(nextBoard : Int){
