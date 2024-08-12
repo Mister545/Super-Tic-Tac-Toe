@@ -18,6 +18,7 @@ class GameBoard {
     private var arrSuper: MutableList<MutableList<Int>> = MutableList(9) { MutableList(9) { 0 } }
 
 
+
     fun setBackgroundButtonsSuper(context: Context, button: Button) {
         button.setBackgroundResource(R.drawable.button_background_tic_tac_toe)
 
@@ -28,9 +29,10 @@ class GameBoard {
 
         button.setTextColor(ContextCompat.getColor(context, R.color.black))
         button.setTextSize(TypedValue.COMPLEX_UNIT_PX, spToPx(context, 20f))
+        button.setTypeface(null, android.graphics.Typeface.BOLD)
     }
     fun setBackgroundButtons(context: Context, button: Button){
-        button.setBackgroundResource(R.drawable.button_background_tic_tac_toe)
+        button.setBackgroundResource(R.drawable.button_background_tic_tac_toe_simple)
 
         val params = button.layoutParams
         params.width = 100.dpToPx()
@@ -39,6 +41,7 @@ class GameBoard {
 
         button.setTextColor(ContextCompat.getColor(context, R.color.black))
         button.setTextSize(TypedValue.COMPLEX_UNIT_PX, spToPx(context, 75f))
+        button.setTypeface(null, android.graphics.Typeface.BOLD)
     }
 
 fun setStrokeOnButtonGreen(button: Button, context: Context) {
@@ -113,7 +116,7 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
             when (element) {
                 1 -> buttonArr[index].text = "X"
                 2 -> buttonArr[index].text = "O"
-                else -> setBackgroundButtons(context, buttonArr[index])
+                else -> buttonArr[index].text = ""
             }
         }
     }
@@ -151,6 +154,7 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
             condition.all { array[it] == player }
         }
     }
+
     fun checkWinSuper(player: Int, array: MutableList<Int>): Boolean {
         val winConditions = arrayOf(
             intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
