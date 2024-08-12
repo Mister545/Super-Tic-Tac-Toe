@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 val currentPlayer = if (step) 1 else 2
                 listBD[index] = currentPlayer
                 firebaseService.setStep(!step)
-                button.setBackgroundResource(if (step) R.drawable.x else R.drawable.o)
+                button.text = (if (step) "X" else "O")
                 firebaseService.setBoardStateSimple(listBD)
             }
         }
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                 val t = object : GenericTypeIndicator<MutableList<Int>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
                 val gameStatus = firebaseService.getStep(boardState)
-                gameBoard.updateBoardAllSimple(boardState, buttonArr)
+                gameBoard.updateBoardAllSimple(this@MainActivity, boardState, buttonArr)
 
                 callback(boardState, gameStatus)
             }
@@ -124,9 +124,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI(boardState: MutableList<Int>) {
         for ((index, button) in buttonArr.withIndex()) {
             when (boardState[index]) {
-                1 -> button.setBackgroundResource(R.drawable.x)
-                2 -> button.setBackgroundResource(R.drawable.o)
-                else -> gameBoard.setBackgroundButtons(button)
+                1 -> button.text = "X"
+                2 -> button.text = "O"
+                else -> gameBoard.setBackgroundButtons(this,button)
             }
         }
     }
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetGame() {
         gameBoard.resetBoardSimple()
         firebaseService.setBoardStateSimple(gameBoard.getBoardState())
-        buttonArr.forEach { gameBoard.setBackgroundButtons(it) }
+        buttonArr.forEach { gameBoard.setBackgroundButtons(this, it) }
     }
 
     private fun replaceFragment(fragment: Fragment) {

@@ -72,7 +72,8 @@ class FirebaseService {
         })
     }
     fun setNextField(field: MutableList<Int>){
-        database.getReference("Stat").child("nextField").setValue(field)
+        val fieldInBd = field.filter { it != -1 }
+        database.getReference("Stat").child("nextField").setValue(fieldInBd)
     }
 
     fun setNextBoard(nextBoard : Int){

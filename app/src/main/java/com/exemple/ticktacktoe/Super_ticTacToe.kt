@@ -67,72 +67,75 @@ class SuperTicTacToe : DialogFragment() {
         setupFirebaseListenerAndChecker()
     }
     private fun setStoke() {
-        getBoardState { board, step ->
-            firebaseService.getNextBoard { nextBoardIndex ->
-                for (i in board.indices) {
-                    for (j in board[i].indices) {
-                        gameBoard.setStrokeOnButtonBlack(
-                            buttonArrWithArr[i][j],
-                            requireContext()
-                        )
-                    }
+        getBoardState { board, _ ->
+            for (i in board.indices) {
+                for (j in board[i].indices) {
+                    gameBoard.setStrokeOnButtonBlack(
+                        buttonArrWithArr[i][j],
+                        requireContext()
+                    )
+                }
+            }
+        }
+
+        firebaseService.getNextBoard {nextBoard ->
+            firebaseService.setNextField(nextField(nextBoard))
+            Log.d("ooo", "Updated arr: ${nextField(nextBoard)}") // Логування оновленого масиву
+
+
+//        getNextField { nextField ->
+            for (j in nextField(nextBoard)) {
+                if (j !in buttonArrWithArr.indices) {
+                    Log.e("Error", "Invalid index: $j")
+                    continue
                 }
 
-                if (nextBoardIndex == 10) {
-                    board.forEachIndexed { index, i ->
-                        for (j in nextField(nextBoardIndex)) {
-                            Log.d("ooo", "jjjjjjjjj ======== $j")
-                            gameBoard.setStrokeOnButtonGreen(
-                                buttonArrWithArr[j][index],
-                                requireContext()
-                            )
-                        }
-                    }
-                } else {
-                    board.forEachIndexed { index, i ->
-                        for (j in nextField(nextBoardIndex)) {
-                            gameBoard.setStrokeOnButtonGreen(
-                                buttonArrWithArr[j][index],
-                                requireContext()
-                            )
-                        }
-                    }
+                buttonArrWithArr[j].forEachIndexed { index, button ->
+                    gameBoard.setStrokeOnButtonGreen(
+                        button,
+                        requireContext()
+                    )
                 }
             }
         }
     }
-
-
     private fun setupButtonListeners() {
         firebaseService.getNextBoard { nextBoard ->
             disableAllButtons()
-            if(gameBoard.checkRightPlace(nextBoard)){
+            if (gameBoard.checkRightPlace(nextBoard)) {
                 disableBoardWinner(nextBoard)
                 firebaseService.setNextBoard(10)
                 buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
-            }
-            else if (nextBoard == 10) {
+            } else if (nextBoard == 10) {
                 buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
             } else {
                 enableBoardButtons(nextBoard)
             }
             firebaseService.setNextField(nextField(nextBoard))
+            setStoke()
         }
-        setStoke()
     }
-    private fun nextField(nextBoard: Int):MutableList<Int>{
-        val arr= mutableListOf(0,1,2,3,4,5,6,7,8)
+
+
+    private fun nextField(nextBoard: Int): MutableList<Int> {
+        val arr = mutableListOf(0, 1, 2, 3, 4, 5, 6, 7, 8)
+        val empty = -1
+
         val winListSuper = gameBoard.getWinListSuper()
-        return if (nextBoard == 10 || prevStepInWinListSuper(nextBoard, winListSuper)) {
+        if (nextBoard == 10 || prevStepInWinListSuper(nextBoard, winListSuper)) {
             winListSuper.forEachIndexed { index, i ->
-                if (i != 0)
-                    arr.removeAt(index)
+                if (i in arr.indices && i != 0) { // Перевірка, чи індекс знаходиться в межах допустимого діапазону
+                    arr[index] = empty
+                }
             }
-            arr
-        }else {
-            mutableListOf(nextBoard)
+            Log.d("ooo", "Updated arr: $arr") // Логування оновленого масиву
+            return arr
+        } else {
+            return mutableListOf(nextBoard)
         }
     }
+
+
     private fun prevStepInWinListSuper(nextBoard: Int, winListSuper: MutableList<Int>) : Boolean{
         winListSuper.forEachIndexed { index, i ->
             return i != 0 && index == nextBoard
@@ -141,7 +144,17 @@ class SuperTicTacToe : DialogFragment() {
     }
 
     private fun disableAllButtons() {
+
         buttonArrWithArr.flatten().forEach { it.isClickable = false }
+    }
+    private fun disableButtonsIsNotNull(array: MutableList<MutableList<Int>>) {
+
+        buttonArrWithArr.forEachIndexed { indexButton, button ->
+            array.forEachIndexed { index, ints ->
+                if (array[indexButton][index] != 0)
+                button[index].isClickable = false
+            }
+        }
     }
     private fun disableBoardWinner(i : Int) {
         buttonArrWithArr[i].forEach { it.isClickable = false }
@@ -159,6 +172,9 @@ class SuperTicTacToe : DialogFragment() {
                     updateBoard(boardIndex, index, button)
                     firebaseService.setNextBoard(index)
                 }
+                getBoardState { mutableLists, _ ->
+                    disableButtonsIsNotNull(mutableLists)
+                }
             }
         }
     }
@@ -169,7 +185,7 @@ class SuperTicTacToe : DialogFragment() {
                 val currentPlayer = if (!step) 2 else 1
                 listBD[boardIndex][index] = currentPlayer
                 firebaseService.setStepSuper(!step)
-                button.setBackgroundResource(if (step) R.drawable.x else R.drawable.o)
+                button.text = (if (step) "X" else "O")
                 firebaseService.setBoardStateSuper(listBD)
             }
         }
@@ -188,6 +204,23 @@ class SuperTicTacToe : DialogFragment() {
             override fun onCancelled(error: DatabaseError) {
                 Log.e("ooo", "Error: ${error.message}")
                 callback(MutableList(9) { MutableList(9) { 0 } }, false)
+            }
+        })
+    }
+    private fun getNextField(callback: (MutableList<Int>) -> Unit) {
+        val databaseReference = database.getReference("Stat/nextField")
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
+                val nextField = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
+
+                callback(nextField)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(MutableList(9) { 0 })
+
+                Log.e("ooo", "Error: ${error.message}")
             }
         })
     }
@@ -212,9 +245,9 @@ class SuperTicTacToe : DialogFragment() {
         boardState.flatten().forEachIndexed { index, value ->
             val button = buttonArrAll[index]
             when (value) {
-                1 -> button.setBackgroundResource(R.drawable.x)
-                2 -> button.setBackgroundResource(R.drawable.o)
-                else -> gameBoard.setBackgroundButtonsSuper(button)
+                1 -> button.text = "X"
+                2 -> button.text = "O"
+                else -> gameBoard.setBackgroundButtonsSuper(requireContext(), button)
             }
         }
     }
@@ -222,7 +255,7 @@ class SuperTicTacToe : DialogFragment() {
     private fun resetGame() {
         gameBoard.resetBoardSuper()
         firebaseService.setBoardStateSuper(gameBoard.getBoardSuper())
-        buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(it)}
+        buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(requireContext(), it)}
     }
 
     private fun handleWin(player: String, winCode: Int) {
