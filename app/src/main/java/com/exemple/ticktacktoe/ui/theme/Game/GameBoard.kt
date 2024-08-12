@@ -24,6 +24,10 @@ class GameBoard {
         params.width = 30.dpToPx()
         params.height = 30.dpToPx()
         button.layoutParams = params
+
+//        val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
+//        layoutParams.setMargins(0.dpToPx(), 0.dpToPx(), 0.dpToPx(), 0.dpToPx()) // Значення в dp потрібно перетворити в px
+//        button.layoutParams = layoutParams
     }
     fun setBackgroundButtons(button: Button){
         button.setBackgroundResource(R.drawable.button_background_tic_tac_toe)
@@ -32,8 +36,16 @@ class GameBoard {
         params.width = 100.dpToPx()
         params.height = 100.dpToPx()
         button.layoutParams = params
+//        setStrokeOnButton(button, Context)
+
+//        val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
+//        layoutParams.setMargins(3.dpToPx(), 3.dpToPx(), 3.dpToPx(), 3.dpToPx()) // Значення в dp потрібно перетворити в px
+//        button.layoutParams = layoutParams
     }
 
+//    private fun con(button: Button){
+//        setStrokeOnButton(button, Context)
+//    }
 fun setStrokeOnButtonGreen(button: Button, context: Context) {
     val background = button.background as? GradientDrawable
     if (background != null) {
@@ -46,6 +58,7 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
     fun setStrokeOnButtonBlack(button: Button, context: Context) {
     val background = button.background as? GradientDrawable
     if (background != null) {
+        // Змінюємо ширину обведення (у пікселях)
         val strokeWidth = context.resources.getDimensionPixelSize(R.dimen.new_stroke_width)
         val strokeColor = ContextCompat.getColor(context, R.color.black)
         background.setStroke(strokeWidth, strokeColor)
@@ -98,8 +111,8 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
 
         array.forEachIndexed { index, element ->
             when (element) {
-                1 -> buttonArr[index].setBackgroundResource(R.drawable.x)
-                2 -> buttonArr[index].setBackgroundResource(R.drawable.o)
+                1 -> buttonArr[index].text = "x"
+                2 -> buttonArr[index].text = "O"
                 else -> setBackgroundButtons(buttonArr[index])
             }
         }

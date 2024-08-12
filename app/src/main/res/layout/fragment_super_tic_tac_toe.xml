@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@android:color/holo_green_dark"
     tools:context=".Super_ticTacToe">
 
     <TableLayout
@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:background="#2C2C2C"
-        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -490,7 +489,7 @@
                         android:text=""
                         android:textColor="@color/white" />
 
-                    <Button
+                        <Button
                         android:id="@+id/button040440"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -986,7 +985,6 @@
         android:text="Result"
         android:textColor="#000000"
         android:textStyle="bold"
-        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -997,10 +995,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="RESET GAME"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
+
+    <Button
+        android:id="@+id/bComeBackSuper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="88dp"
+        android:text="Button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
