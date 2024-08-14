@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.exemple.ticktacktoe.databinding.ActivityMainBinding
 import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
 import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
@@ -47,6 +46,20 @@ class SuperTicTacToe : AppCompatActivity() {
             // resetUi()
         }
         binding.bComeBackSuper.setOnClickListener {
+            val databaseReference = database.getReference("Stat")
+
+            databaseReference.removeEventListener(nextBoardListener!!)
+            databaseReference.removeEventListener(nextFieldListener!!)
+            databaseReference.removeEventListener(boardStateListener!!)
+
+            databaseReference.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "Node removed successfully.")
+                } else {
+                    Log.e("Firebase", "Failed to remove node.", task.exception)
+                }
+            }
+
             finish()
 
             Log.d("ooo", "${gameBoard.getBoardSuper()}")
@@ -61,6 +74,7 @@ class SuperTicTacToe : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         firebaseService.setNextBoard(10)
+        firebaseService.setStepSuper(true)
         firebaseService.setBoardStateSuper(gameBoard.getBoardSuper())
         setupButtons()
         initialization()
@@ -68,27 +82,6 @@ class SuperTicTacToe : AppCompatActivity() {
         Log.d("ooo", "${gameBoard.getBoardSuper()}")
 
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        
-        // Очищення кешованих файлів
-        val cacheDir = cacheDir
-        deleteDir(cacheDir)
-    }
-
-    private fun deleteDir(dir: File?): Boolean {
-        if (dir == null || !dir.isDirectory) return false
-        val children = dir.list()
-        if (children != null) {
-            for (i in children.indices) {
-                val success = deleteDir(File(dir, children[i]))
-                if (!success) return false
-            }
-        }
-        return dir.delete()
-    }
-
 
     private fun setupButtons() {
         buttonArrWithArr = listOf(
@@ -196,12 +189,12 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun initialization() {
-        setupButtonListeners()
+
         setupFirebaseListenerAndChecker()
         resetGame()
     }
 
-    private fun setStoke() {
+    private fun setStoke(nextBoard: Int) {
 
         getBoardState { board, _ ->
             for (i in board.indices) {
@@ -212,9 +205,6 @@ class SuperTicTacToe : AppCompatActivity() {
                     )
                 }
             }
-        }
-
-        getNextBoard { nextBoard ->
 
             for (j in nextField(nextBoard)) {
                 if (j !in buttonArrWithArr.indices) {
@@ -222,33 +212,44 @@ class SuperTicTacToe : AppCompatActivity() {
                     continue
                 }
 
-                buttonArrWithArr[j].forEachIndexed { index, button ->
+                buttonArrWithArr[j].forEachIndexed { _ , button ->
                     gameBoard.setStrokeOnButtonGreen(
                         button,
                         this
                     )
-
                 }
             }
         }
     }
 
+    private fun handleBoardUpdates(nextBoard: Int, nextField: MutableList<Int>) {
+        setupButtonListeners(nextBoard)
+    }
 
-    private fun setupButtonListeners() {
-        getNextBoard { nextBoard ->
-            disableAllButtons()
-            if (gameBoard.checkRightPlace(nextBoard)) {
-                disableBoardWinner(nextBoard)
-                firebaseService.setNextBoard(10)
-                buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
-            } else if (nextBoard == 10) {
-                buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
-            } else {
-                enableBoardButtons(nextBoard)
-            }
-            firebaseService.setNextField(nextField(nextBoard))
-            setStoke()
+    //    private fun setupButtonListeners(nextBoard: Int) {
+//        buttonArrWithArr.forEachIndexed { i, _ ->
+//            buttonArrWithArr[i].forEachIndexed { index, button ->
+//                button.isClickable = nextBoard == i || nextBoard == 10
+//                button.setOnClickListener {
+//                    updateBoard(i, index, button)
+//                    firebaseService.setNextBoard(index)
+//                }
+//            }
+//        }
+//    }
+    private fun setupButtonListeners(nextBoard: Int) {
+        firebaseService.setNextField(nextField(nextBoard))
+        disableAllButtons()
+        if (gameBoard.checkRightPlace(nextBoard)) {
+            disableBoardWinner(nextBoard)
+            firebaseService.setNextBoard(10)
+            buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
+        } else if (nextBoard == 10) {
+            buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
+        } else {
+            enableBoardButtons(nextBoard)
         }
+        setStoke(nextBoard)
     }
 
 
@@ -322,7 +323,7 @@ class SuperTicTacToe : AppCompatActivity() {
                 val currentPlayer = if (!step) 2 else 1
                 listBD[boardIndex][index] = currentPlayer
                 firebaseService.setStepSuper(!step)
-                button.text = (if (step) "X" else "O")
+                button.text = if (step) "X" else "O"
                 firebaseService.setBoardStateSuper(listBD)
             }
         }
@@ -333,6 +334,7 @@ class SuperTicTacToe : AppCompatActivity() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val nextBoard = dataSnapshot.getValue(Int::class.java)!!
                 callback(nextBoard)
+                Log.e("ooo", "nextBoard=======$nextBoard")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -377,13 +379,16 @@ class SuperTicTacToe : AppCompatActivity() {
         databaseReference.addValueEventListener(nextFieldListener!!)
     }
     private fun setupFirebaseListenerAndChecker() {
-        val databaseReference = database.getReference("Stat/data")
+        val databaseReference = database.getReference("Stat")
         firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val t = object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}
-                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { MutableList(9) { 0 } }
+                val boardState = dataSnapshot.child("data").getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}) ?: MutableList(9) { MutableList(9) { 0 } }
+                val nextBoard = dataSnapshot.child("prevStep").getValue(Int::class.java) ?: 10
+                val nextField = dataSnapshot.child("nextField").getValue(object : GenericTypeIndicator<MutableList<Int>>() {}) ?: MutableList(9) { 0 }
+
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
+                handleBoardUpdates(nextBoard, nextField)
             }
 
             override fun onCancelled(error: DatabaseError) {

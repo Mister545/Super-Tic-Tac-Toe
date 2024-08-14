@@ -74,28 +74,6 @@ class FirebaseService {
     fun setBoardStateSuper(arr: MutableList<MutableList<Int>>) {
         database.getReference("Stat").child("data").setValue(arr)
     }
-
-    fun getBoardStateAndStep(callback: (MutableList<Int>, Boolean) -> Unit) {
-        val databaseReference = database.getReference("Stat/Place")
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
-                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-                val gameStatus = getStep(boardState)
-
-                callback(boardState, gameStatus)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(MutableList(9) { 0 }, false)
-
-                // Логування помилки
-                Log.e("ooo", "Error: ${error.message}")
-            }
-        })
-    }
-
-
     fun setWin(win: Int) {
         database.getReference("StatSimple").child("winner").setValue(win)
     }
