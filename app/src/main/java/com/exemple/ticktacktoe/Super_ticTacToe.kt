@@ -155,6 +155,7 @@ class SuperTicTacToe : AppCompatActivity() {
         exitListeners()
         setupFirebaseListenerAndChecker()
         firebaseService.setNextBoard(10)
+        firebaseService.setNextField(nextField(10))
         firebaseService.setStepSuper(true)
         resetGame()
     }
@@ -237,11 +238,12 @@ class SuperTicTacToe : AppCompatActivity() {
 //        }
 //    }
     private fun setupButtonListeners(nextBoard: Int) {
-        firebaseService.setNextField(nextField(nextBoard))
+//        firebaseService.setNextField(nextField(nextBoard))
         disableAllButtons()
         if (gameBoard.checkRightPlace(nextBoard)) {
             disableBoardWinner(nextBoard)
             firebaseService.setNextBoard(10)
+            firebaseService.setNextField(nextField(10))
             buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
         } else if (nextBoard == 10) {
             buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
@@ -304,10 +306,12 @@ class SuperTicTacToe : AppCompatActivity() {
                 Log.d("ooo", "chacking======${gameBoard.checkRightPlace(boardIndex)}")
                 disableBoardWinner(boardIndex)
                 firebaseService.setNextBoard(10)
+                firebaseService.setNextField(nextField(10))
             } else {
                 button.setOnClickListener {
                     updateBoard(boardIndex, index, button)
                     firebaseService.setNextBoard(index)
+                    firebaseService.setNextField(nextField(index))
                 }
                 getBoardState { mutableLists, _ ->
                     disableButtonsIsNotNull(mutableLists)
