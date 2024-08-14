@@ -7,9 +7,7 @@ import android.util.TypedValue
 import android.widget.Button
 
 import androidx.core.content.ContextCompat
-import androidx.core.util.TypedValueCompat.dpToPx
-
-import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
+import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
 
 class GameBoard {
 
@@ -63,7 +61,7 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
 }
 
 
-    fun spToPx(context: Context, sp: Float): Float {
+    private fun spToPx(context: Context, sp: Float): Float {
         val scaledDensity = context.resources.displayMetrics.scaledDensity
         return sp * scaledDensity
     }
@@ -89,7 +87,7 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
         arrSimple[index] = player
     }
 
-    fun checkWinSuper(boardState: MutableList<MutableList<Int>>, binding: FragmentSuperTicTacToeBinding){
+    fun checkWinSuper(boardState: MutableList<MutableList<Int>>, binding: ActivitySuperTicTacToeBinding){
         boardState.forEachIndexed { indexI, i ->
             when {
                 checkWin(1, i) -> winListSuper[indexI] = 1

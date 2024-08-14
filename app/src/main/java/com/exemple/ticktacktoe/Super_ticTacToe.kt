@@ -2,11 +2,9 @@ package com.exemple.ticktacktoe
 
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
+import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
 import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,7 +15,7 @@ import com.google.firebase.database.ValueEventListener
 
 class SuperTicTacToe : AppCompatActivity() {
 
-    private lateinit var binding: FragmentSuperTicTacToeBinding
+    private lateinit var binding: ActivitySuperTicTacToeBinding
     private lateinit var buttonArrWithArr: List<List<Button>>
     private lateinit var buttonArrAll: List<Button>
     private val database = FirebaseDatabase.getInstance()
@@ -28,7 +26,7 @@ class SuperTicTacToe : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentSuperTicTacToeBinding.inflate(layoutInflater)
+        binding = ActivitySuperTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.bComeBackSuper.setOnClickListener {
@@ -225,20 +223,7 @@ class SuperTicTacToe : AppCompatActivity() {
     private fun handleBoardUpdates(nextBoard: Int) {
         setupButtonListeners(nextBoard)
     }
-
-    //    private fun setupButtonListeners(nextBoard: Int) {
-//        buttonArrWithArr.forEachIndexed { i, _ ->
-//            buttonArrWithArr[i].forEachIndexed { index, button ->
-//                button.isClickable = nextBoard == i || nextBoard == 10
-//                button.setOnClickListener {
-//                    updateBoard(i, index, button)
-//                    firebaseService.setNextBoard(index)
-//                }
-//            }
-//        }
-//    }
     private fun setupButtonListeners(nextBoard: Int) {
-//        firebaseService.setNextField(nextField(nextBoard))
         disableAllButtons()
         if (gameBoard.checkRightPlace(nextBoard)) {
             disableBoardWinner(nextBoard)
@@ -271,7 +256,6 @@ class SuperTicTacToe : AppCompatActivity() {
             mutableListOf(nextBoard)
         }
     }
-
 
     private fun prevStepInWinListSuper(nextBoard: Int, winListSuper: MutableList<Int>): Boolean {
         winListSuper.forEachIndexed { index, i ->
@@ -367,6 +351,9 @@ class SuperTicTacToe : AppCompatActivity() {
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
                 handleBoardUpdates(nextBoard)
+                firebaseService.setWinSuper(gameBoard.getWinListSuper())
+                Log.d("ooo", "boardState=========$boardState")
+                Log.d("ooo", "nextBoard=========$nextBoard")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -383,28 +370,27 @@ class SuperTicTacToe : AppCompatActivity() {
             when (value) {
                 1 -> button.text = "X"
                 2 -> button.text = "O"
-                else -> gameBoard.setBackgroundButtonsSuper(this, button)
+                else -> button.text = " "
             }
         }
     }
-
 
     private fun resetGame() {
         firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
         buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(this, it) }
     }
 
-    private fun handleWin(player: String, winCode: Int) {
-        binding.TextWin.text = "Win $player"
-        binding.TextWin.setTextColor(ContextCompat.getColor(this, R.color.green))
-        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
-        firebaseService.setWin(winCode)
-    }
-
-    private fun handleDraw() {
-        binding.TextWin.text = "Draw"
-        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
-        firebaseService.setWinSuper(0)
-    }
+//    private fun handleWin(player: String, winCode: Int) {
+//        binding.TextWin.text =  getString(R.string.winText, player)
+//        binding.TextWin.setTextColor(ContextCompat.getColor(this, R.color.green))
+//        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
+//        firebaseService.setWin(winCode)
+//    }
+//
+//    private fun handleDraw() {
+//        binding.TextWin.text = getString(R.string.drawText)
+//        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
+//        firebaseService.setWinSuper(0)
+//    }
 }
 

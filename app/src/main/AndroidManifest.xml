@@ -23,7 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SimpleTicTacToe">
+        <activity android:name=".ui.theme.SimpleTicTacToe">
             <!-- Налаштування для активності, якщо є -->
         </activity>
         <activity android:name=".SuperTicTacToe">

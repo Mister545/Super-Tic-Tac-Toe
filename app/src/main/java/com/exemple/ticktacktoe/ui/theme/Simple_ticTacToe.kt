@@ -1,22 +1,13 @@
-// MainActivity.kt
-package com.exemple.ticktacktoe
+package com.exemple.ticktacktoe.ui.theme
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import com.exemple.ticktacktoe.databinding.ActivityMainBinding
-import com.exemple.ticktacktoe.databinding.FragmentSimpleTicTacToeBinding
-import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
+import com.exemple.ticktacktoe.GameBoard
+import com.exemple.ticktacktoe.MainActivity
+import com.exemple.ticktacktoe.databinding.ActivitySimpleTicTacToeBinding
 import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -26,7 +17,7 @@ import com.google.firebase.database.ValueEventListener
 
 class SimpleTicTacToe : AppCompatActivity() {
 
-    private lateinit var binding: FragmentSimpleTicTacToeBinding
+    private lateinit var binding: ActivitySimpleTicTacToeBinding
     private lateinit var buttonArr: List<Button>
     private val gameBoard = GameBoard()
     val firebaseService = FirebaseService()
@@ -35,7 +26,7 @@ class SimpleTicTacToe : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentSimpleTicTacToeBinding.inflate(layoutInflater)
+        binding = ActivitySimpleTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         buttonArr = arrayListOf(

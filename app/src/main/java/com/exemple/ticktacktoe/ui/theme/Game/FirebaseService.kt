@@ -83,17 +83,16 @@ class FirebaseService {
     fun setNextBoard(nextBoard : Int){
         database.getReference("Stat/prevStep").setValue(nextBoard)
     }
-
     fun setBoardStateSimple(arr: MutableList<Int>) {
         database.getReference("StatSimple").child("data").setValue(arr)
     }
     fun setBoardStateSuper(arr: MutableList<MutableList<Int>>) {
         database.getReference("Stat").child("data").setValue(arr)
     }
-    fun setWin(win: Int) {
+    fun setWin(win: MutableList<Int>) {
         database.getReference("StatSimple").child("winner").setValue(win)
     }
-    fun setWinSuper(win: Int) {
-        database.getReference("Stat").child("Board/WinSuper").setValue(win)
+    fun setWinSuper(win: MutableList<Int>) {
+        database.getReference("Stat").child("winPosition").setValue(win)
     }
 }
