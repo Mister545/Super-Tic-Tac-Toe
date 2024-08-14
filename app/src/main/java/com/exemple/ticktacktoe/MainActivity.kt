@@ -21,10 +21,7 @@ import com.google.firebase.database.ValueEventListener
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var buttonArr: List<Button>
-    private val gameBoard = GameBoard()
     private val firebaseService = FirebaseService()
-    private val database = FirebaseDatabase.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

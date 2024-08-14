@@ -1,17 +1,11 @@
 package com.exemple.ticktacktoe
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import com.exemple.ticktacktoe.databinding.FragmentSuperTicTacToeBinding
 import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
@@ -19,7 +13,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
-import java.io.File
 
 
 class SuperTicTacToe : AppCompatActivity() {
@@ -30,57 +23,24 @@ class SuperTicTacToe : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance()
     private val firebaseService = FirebaseService()
     private val gameBoard = GameBoard()
-    private lateinit var firebaseListener: ValueEventListener
+    private var firebaseListener: ValueEventListener? = null
     private var boardStateListener: ValueEventListener? = null
-    private var nextBoardListener: ValueEventListener? = null
-    private var nextFieldListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentSuperTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
-        binding.resetSuper.setOnClickListener {
-            // resetUi()
-        }
         binding.bComeBackSuper.setOnClickListener {
-            val databaseReference = database.getReference("Stat")
-
-            databaseReference.removeEventListener(nextBoardListener!!)
-            databaseReference.removeEventListener(nextFieldListener!!)
-            databaseReference.removeEventListener(boardStateListener!!)
-
-            databaseReference.removeValue().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("Firebase", "Node removed successfully.")
-                } else {
-                    Log.e("Firebase", "Failed to remove node.", task.exception)
-                }
-            }
-
-            finish()
-
-            Log.d("ooo", "${gameBoard.getBoardSuper()}")
+            firebaseService.setExitCode(1)
         }
-    }
-
-//    override fun onPause() {
-//        super.onPause()
-//        resetGame()
-//    }
-
-    override fun onResume() {
-        super.onResume()
-        firebaseService.setNextBoard(10)
-        firebaseService.setStepSuper(true)
-        firebaseService.setBoardStateSuper(gameBoard.getBoardSuper())
         setupButtons()
         initialization()
-        setupFirebaseListenerAndChecker() // Перемістіть сюди
-        Log.d("ooo", "${gameBoard.getBoardSuper()}")
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        removeListeners()
     }
 
     private fun setupButtons() {
@@ -189,10 +149,49 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun initialization() {
-
+        restartListeners()
+        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
+        firebaseService.setExitCode(0)
+        exitListeners()
         setupFirebaseListenerAndChecker()
+        firebaseService.setNextBoard(10)
+        firebaseService.setStepSuper(true)
         resetGame()
     }
+    private fun exitWithActivity() {
+        removeListeners() // Видалення слухачів
+        clearDataFromFirebase() // Очищення даних
+        finish() // Завершення активності
+    }
+    private fun clearDataFromFirebase() {
+        val databaseReference = database.getReference("Stat")
+        databaseReference.removeValue().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase", "Data removed successfully.")
+            } else {
+                Log.e("Firebase", "Failed to remove data.", task.exception)
+            }
+        }
+    }
+
+    private fun exitListeners(){
+        firebaseService.getExitCode { code ->
+            if (code == 1)
+                exitWithActivity()
+        }
+    }
+    private fun removeListeners() {
+        val databaseReference = database.getReference("Stat")
+        boardStateListener?.let {
+            databaseReference.removeEventListener(it)
+        }
+        firebaseListener?.let {
+            databaseReference.removeEventListener(it)
+        }
+        boardStateListener = null
+        firebaseListener = null
+    }
+
 
     private fun setStoke(nextBoard: Int) {
 
@@ -222,7 +221,7 @@ class SuperTicTacToe : AppCompatActivity() {
         }
     }
 
-    private fun handleBoardUpdates(nextBoard: Int, nextField: MutableList<Int>) {
+    private fun handleBoardUpdates(nextBoard: Int) {
         setupButtonListeners(nextBoard)
     }
 
@@ -287,7 +286,7 @@ class SuperTicTacToe : AppCompatActivity() {
     private fun disableButtonsIsNotNull(array: MutableList<MutableList<Int>>) {
 
         buttonArrWithArr.forEachIndexed { indexButton, button ->
-            array.forEachIndexed { index, ints ->
+            array.forEachIndexed { index, _ ->
                 if (array[indexButton][index] != 0)
                     button[index].isClickable = false
             }
@@ -316,6 +315,12 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
+    private fun restartListeners() {
+        removeListeners()
+        getBoardState{_, _-> }
+        setupFirebaseListenerAndChecker()
+    }
+
 
     private fun updateBoard(boardIndex: Int, index: Int, button: Button) {
         getBoardState { listBD, step ->
@@ -328,29 +333,16 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
-    private fun getNextBoard(callback: (Int) -> Unit) {
-        val databaseReference = database.getReference("Stat/prevStep")
-        nextBoardListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val nextBoard = dataSnapshot.getValue(Int::class.java)!!
-                callback(nextBoard)
-                Log.e("ooo", "nextBoard=======$nextBoard")
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                println("Помилка зчитування з Firebase: ${error.message}")
-            }
-        }
-        databaseReference.addValueEventListener(nextBoardListener!!)
-    }
-
     private fun getBoardState(callback: (MutableList<MutableList<Int>>, Boolean) -> Unit) {
         val databaseReference = database.getReference("Stat/data")
-        boardStateListener = object : ValueEventListener {
+
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { MutableList(9) { 0 } }
                 val gameStatus = firebaseService.getStepSuper(boardState)
+                binding.textIsNextX.text = if(firebaseService.getStepSuper(boardState)) "next step X" else "next step O"
+
                 callback(boardState, gameStatus)
             }
 
@@ -358,44 +350,26 @@ class SuperTicTacToe : AppCompatActivity() {
                 Log.e("ooo", "Error: ${error.message}")
                 callback(MutableList(9) { MutableList(9) { 0 } }, false)
             }
-        }
-        databaseReference.addValueEventListener(boardStateListener!!)
+        })
     }
 
-    private fun getNextField(callback: (MutableList<Int>) -> Unit) {
-        val databaseReference = database.getReference("Stat/nextField")
-        nextFieldListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
-                val nextField = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-                callback(nextField)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback(MutableList(9) { 0 })
-                Log.e("ooo", "Error: ${error.message}")
-            }
-        }
-        databaseReference.addValueEventListener(nextFieldListener!!)
-    }
     private fun setupFirebaseListenerAndChecker() {
         val databaseReference = database.getReference("Stat")
+
         firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val boardState = dataSnapshot.child("data").getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}) ?: MutableList(9) { MutableList(9) { 0 } }
                 val nextBoard = dataSnapshot.child("prevStep").getValue(Int::class.java) ?: 10
-                val nextField = dataSnapshot.child("nextField").getValue(object : GenericTypeIndicator<MutableList<Int>>() {}) ?: MutableList(9) { 0 }
-
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
-                handleBoardUpdates(nextBoard, nextField)
+                handleBoardUpdates(nextBoard)
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("ooo", "Error: ${error.message}")
             }
         }
-        databaseReference.addValueEventListener(firebaseListener)
+        databaseReference.addValueEventListener(firebaseListener!!)
     }
 
     private fun updateUI(boardState: MutableList<MutableList<Int>>) {
@@ -412,8 +386,6 @@ class SuperTicTacToe : AppCompatActivity() {
 
 
     private fun resetGame() {
-//        gameBoard.resetBoardSuper()
-
         firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
         buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(this, it) }
     }

@@ -7,6 +7,17 @@
     android:background="@android:color/holo_green_dark"
     tools:context=".Super_ticTacToe">
 
+    <TextView
+        android:id="@+id/textIsNextX"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="TextView"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="@+id/TextWin"
+        app:layout_constraintStart_toStartOf="@+id/TextWin"
+        app:layout_constraintTop_toBottomOf="@+id/TextWin" />
+
     <TableLayout
         android:id="@+id/tableLayout2"
         android:layout_width="wrap_content"
@@ -988,7 +999,7 @@
         android:id="@+id/TextWin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="48dp"
         android:text="Result"
         android:textColor="#000000"
         android:textStyle="bold"
@@ -1013,11 +1024,10 @@
         android:id="@+id/bComeBackSuper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="88dp"
         android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
