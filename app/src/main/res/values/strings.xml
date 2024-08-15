@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Tick tack toe</string>
-    <string name="TicTacToeText">Tick tack toe</string>
+    <string name="TicTacToeText">Tic tac toe</string>
     <!-- super tic tac toe activity -->
     <string name="winText">Win %1$s</string>
     <string name="drawText">Draw %1$s</string>

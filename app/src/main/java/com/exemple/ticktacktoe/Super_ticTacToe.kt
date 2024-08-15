@@ -1,5 +1,6 @@
 package com.exemple.ticktacktoe
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -147,13 +148,14 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun initialization() {
-        restartListeners()
-        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
         firebaseService.setExitCode(0)
         exitListeners()
+        firebaseService.setNextField(MutableList(9) {0})
+        firebaseService.setWinSuper(MutableList(9) {0})
+//        restartListeners()
+        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
         setupFirebaseListenerAndChecker()
         firebaseService.setNextBoard(10)
-        firebaseService.setNextField(nextField(10))
         firebaseService.setStepSuper(true)
         resetGame()
     }
@@ -297,15 +299,15 @@ class SuperTicTacToe : AppCompatActivity() {
                     firebaseService.setNextBoard(index)
                     firebaseService.setNextField(nextField(index))
                 }
-                getBoardState { mutableLists, _ ->
-                    disableButtonsIsNotNull(mutableLists)
-                }
+//                getBoardState { mutableLists, _ ->
+//                    disableButtonsIsNotNull(mutableLists)
+//                }
             }
         }
     }
     private fun restartListeners() {
         removeListeners()
-        getBoardState{_, _-> }
+//        getBoardState{_, _-> }
         setupFirebaseListenerAndChecker()
     }
 
@@ -350,8 +352,10 @@ class SuperTicTacToe : AppCompatActivity() {
                 val nextBoard = dataSnapshot.child("prevStep").getValue(Int::class.java) ?: 10
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
-                handleBoardUpdates(nextBoard)
                 firebaseService.setWinSuper(gameBoard.getWinListSuper())
+                handleBoardUpdates(nextBoard)
+                firebaseService.setNextField(nextField(nextBoard))
+                disableButtonsIsNotNull(boardState)
                 Log.d("ooo", "boardState=========$boardState")
                 Log.d("ooo", "nextBoard=========$nextBoard")
             }

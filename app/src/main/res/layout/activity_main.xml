@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E6E6E6"
+    android:background="@drawable/background_main"
     android:orientation="vertical"
     android:visibility="visible">
 
@@ -13,33 +13,60 @@
         android:id="@+id/TicTacToeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="112dp"
+        android:layout_marginTop="124dp"
         android:text="@string/TicTacToeText"
         android:textAllCaps="false"
-        android:textColor="#000000"
-        android:textSize="25sp"
+        android:textColor="@color/white"
+        android:textSize="50sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="by Denys"
+        android:textColor="@color/main_orange_text"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/TicTacToeText"
+        app:layout_constraintTop_toBottomOf="@+id/superText" />
+
+    <TextView
+        android:id="@+id/superText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Super"
+        android:textAllCaps="false"
+        android:textColor="@color/main_orange_text"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/TicTacToeText"
+        app:layout_constraintStart_toStartOf="@+id/TicTacToeText"
+        app:layout_constraintTop_toBottomOf="@+id/TicTacToeText" />
 
     <Button
         android:id="@+id/bPlaySuper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="55dp"
+        android:background="@drawable/button_main"
         android:text="Play Super"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/bPlaySimple"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/bPlaySimple"
         app:layout_constraintTop_toBottomOf="@+id/bPlaySimple" />
 
     <Button
         android:id="@+id/bPlaySimple"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
         android:layout_marginTop="150dp"
+        android:background="@drawable/button_main"
         android:text="Play Simple"
+        android:textColor="@color/white"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@+id/TicTacToeText"
         app:layout_constraintStart_toStartOf="@+id/TicTacToeText"
@@ -53,8 +80,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/fragmentConteinerSuper"
         android:layout_width="match_parent"
@@ -63,7 +90,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Online"
+        android:textColor="@color/main_orange_text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/chip"
+        app:layout_constraintEnd_toStartOf="@+id/chip"
+        app:layout_constraintTop_toTopOf="@+id/chip" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/chip"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="52dp"
+        app:layout_constraintEnd_toEndOf="@+id/bPlaySuper"
+        app:layout_constraintHorizontal_bias="0.736"
+        app:layout_constraintStart_toStartOf="@+id/bPlaySuper"
+        app:layout_constraintTop_toBottomOf="@+id/bPlaySuper" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
