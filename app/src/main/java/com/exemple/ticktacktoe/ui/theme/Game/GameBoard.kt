@@ -29,7 +29,7 @@ class GameBoard {
         button.setTextSize(TypedValue.COMPLEX_UNIT_PX, spToPx(context, 20f))
         button.setTypeface(null, android.graphics.Typeface.BOLD)
     }
-    fun setBackgroundButtons(context: Context, button: Button){
+    fun setBackgroundButtonsSimple(context: Context, button: Button){
         button.setBackgroundResource(R.drawable.button_background_tic_tac_toe_simple)
 
         val params = button.layoutParams
@@ -42,20 +42,20 @@ class GameBoard {
         button.setTypeface(null, android.graphics.Typeface.BOLD)
     }
 
-fun setStrokeOnButtonGreen(button: Button, context: Context) {
+fun setStrokeOnButtonOn(button: Button, context: Context) {
     val background = button.background as? GradientDrawable
     if (background != null) {
         // Змінюємо ширину обведення (у пікселях)
         val strokeWidth = context.resources.getDimensionPixelSize(R.dimen.new_stroke_width)
-        val strokeColor = ContextCompat.getColor(context, R.color.green)
+        val strokeColor = ContextCompat.getColor(context, R.color.black)
         background.setStroke(strokeWidth, strokeColor)
     }
 }
-    fun setStrokeOnButtonBlack(button: Button, context: Context) {
+    fun setStrokeOnButtonOff(button: Button, context: Context) {
     val background = button.background as? GradientDrawable
     if (background != null) {
         val strokeWidth = context.resources.getDimensionPixelSize(R.dimen.new_stroke_width)
-        val strokeColor = ContextCompat.getColor(context, R.color.black)
+        val strokeColor = ContextCompat.getColor(context, R.color.stroke_buttons)
         background.setStroke(strokeWidth, strokeColor)
     }
 }
@@ -74,10 +74,6 @@ fun setStrokeOnButtonGreen(button: Button, context: Context) {
     }
     fun getBoardState(): MutableList<Int> {
         return arrSimple
-    }
-
-    fun getBoardSuper(): MutableList<MutableList<Int>> {
-        return arrSuper
     }
     fun getWinListSuper() : MutableList<Int>{
         return winListSuper

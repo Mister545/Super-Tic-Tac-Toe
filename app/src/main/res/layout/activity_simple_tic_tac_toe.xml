@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_green_dark"
+    android:background="@drawable/background_main"
     android:orientation="vertical"
     android:visibility="visible">
 
@@ -16,23 +16,12 @@
         android:layout_marginTop="112dp"
         android:text="@string/TicTacToeText"
         android:textAllCaps="false"
-        android:textColor="#000000"
+        android:textColor="@color/main_orange_text"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/buttonReset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="Reset Game"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 
     <TableLayout
         android:id="@+id/tableLayout"
@@ -135,11 +124,14 @@
 
     <Button
         android:id="@+id/bComeBackSimple"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/button_main"
         android:text="Button"
-        app:layout_constraintEnd_toEndOf="@+id/buttonReset"
-        app:layout_constraintStart_toStartOf="@+id/buttonReset"
-        app:layout_constraintTop_toBottomOf="@+id/buttonReset" />
+        app:layout_constraintEnd_toEndOf="@+id/tableLayout"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="@+id/tableLayout"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

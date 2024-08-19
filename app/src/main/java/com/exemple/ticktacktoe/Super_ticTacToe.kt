@@ -161,7 +161,7 @@ class SuperTicTacToe : AppCompatActivity() {
     }
     private fun exitWithActivity() {
         removeListeners() // Видалення слухачів
-        clearDataFromFirebase() // Очищення даних
+//        clearDataFromFirebase() // Очищення даних
         finish() // Завершення активності
     }
     private fun clearDataFromFirebase() {
@@ -199,7 +199,7 @@ class SuperTicTacToe : AppCompatActivity() {
         getBoardState { board, _ ->
             for (i in board.indices) {
                 for (j in board[i].indices) {
-                    gameBoard.setStrokeOnButtonBlack(
+                    gameBoard.setStrokeOnButtonOff(
                         buttonArrWithArr[i][j],
                         this
                     )
@@ -213,7 +213,7 @@ class SuperTicTacToe : AppCompatActivity() {
                 }
 
                 buttonArrWithArr[j].forEachIndexed { _ , button ->
-                    gameBoard.setStrokeOnButtonGreen(
+                    gameBoard.setStrokeOnButtonOn(
                         button,
                         this
                     )

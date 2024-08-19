@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_green_dark">
+    android:background="@drawable/background_main">
 
     <TextView
         android:id="@+id/textIsNextX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
+        android:textStyle="bold"
         android:text="TextView"
-        android:textColor="#000000"
+        android:textColor="@color/main_orange_text"
         app:layout_constraintEnd_toEndOf="@+id/TextWin"
         app:layout_constraintStart_toStartOf="@+id/TextWin"
         app:layout_constraintTop_toBottomOf="@+id/TextWin" />
@@ -1000,7 +1001,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:text="Result"
-        android:textColor="#000000"
+        android:textColor="@color/main_orange_text"
         android:textStyle="bold"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -1023,6 +1024,8 @@
         android:id="@+id/bComeBackSuper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/button_main"
         android:text="Button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

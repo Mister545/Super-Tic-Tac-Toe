@@ -36,10 +36,6 @@ class SimpleTicTacToe : AppCompatActivity() {
         )
         initialization()
 
-
-        binding.buttonReset.setOnClickListener {
-            resetUi()
-        }
         binding.bComeBackSimple.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -133,7 +129,7 @@ class SimpleTicTacToe : AppCompatActivity() {
                 when (boardState[index]) {
                     1 -> button.text = "X"
                     2 -> button.text = "O"
-                    else -> gameBoard.setBackgroundButtons(this, button)
+                    else -> gameBoard.setBackgroundButtonsSimple(this, button)
                 }
         }
     }
@@ -152,7 +148,7 @@ class SimpleTicTacToe : AppCompatActivity() {
     private fun resetGame() {
         gameBoard.resetBoardSimple()
         firebaseService.setBoardStateSimple(gameBoard.getBoardState())
-        buttonArr.forEach { gameBoard.setBackgroundButtons(this, it) }
+        buttonArr.forEach { gameBoard.setBackgroundButtonsSimple(this, it) }
     }
 
     private fun resetUi(){
