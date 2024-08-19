@@ -299,15 +299,11 @@ class SuperTicTacToe : AppCompatActivity() {
                     firebaseService.setNextBoard(index)
                     firebaseService.setNextField(nextField(index))
                 }
-//                getBoardState { mutableLists, _ ->
-//                    disableButtonsIsNotNull(mutableLists)
-//                }
             }
         }
     }
     private fun restartListeners() {
         removeListeners()
-//        getBoardState{_, _-> }
         setupFirebaseListenerAndChecker()
     }
 
