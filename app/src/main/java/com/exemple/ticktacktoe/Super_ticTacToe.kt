@@ -1,12 +1,11 @@
 package com.exemple.ticktacktoe
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
-import com.exemple.ticktacktoe.ui.theme.Game.FirebaseService
+import com.exemple.ticktacktoe.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -31,7 +30,7 @@ class SuperTicTacToe : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.bComeBackSuper.setOnClickListener {
-            firebaseService.setExitCode(1)
+            firebaseService.setExitCode(1, FirebasePatches.exitCode)
         }
         setupButtons()
         initialization()
@@ -148,15 +147,15 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun initialization() {
-        firebaseService.setExitCode(0)
+        firebaseService.setExitCode(0, FirebasePatches.exitCode)
         exitListeners()
-        firebaseService.setNextField(MutableList(9) {0})
-        firebaseService.setWinSuper(MutableList(9) {0})
+        firebaseService.setNextField(MutableList(9) {0}, FirebasePatches.nextField)
+        firebaseService.setWinSuper(MutableList(9) {0}, FirebasePatches.winSuper)
 //        restartListeners()
-        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
+        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } }, FirebasePatches.boardStateSuper)
         setupFirebaseListenerAndChecker()
-        firebaseService.setNextBoard(10)
-        firebaseService.setStepSuper(true)
+        firebaseService.setNextBoard(10, FirebasePatches.nextBoard)
+        firebaseService.setStepSuper(true, FirebasePatches.stepSuper)
         resetGame()
     }
     private fun exitWithActivity() {
@@ -165,7 +164,7 @@ class SuperTicTacToe : AppCompatActivity() {
         finish() // Завершення активності
     }
     private fun clearDataFromFirebase() {
-        val databaseReference = database.getReference("Stat")
+        val databaseReference = database.getReference(FirebasePatches.refSuper)
         databaseReference.removeValue().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d("Firebase", "Data removed successfully.")
@@ -176,13 +175,13 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun exitListeners(){
-        firebaseService.getExitCode { code ->
+        firebaseService.getExitCode(FirebasePatches.exitCode) { code ->
             if (code == 1)
                 exitWithActivity()
         }
     }
     private fun removeListeners() {
-        val databaseReference = database.getReference("Stat")
+        val databaseReference = database.getReference(FirebasePatches.refSuper)
         boardStateListener?.let {
             databaseReference.removeEventListener(it)
         }
@@ -229,8 +228,8 @@ class SuperTicTacToe : AppCompatActivity() {
         disableAllButtons()
         if (gameBoard.checkRightPlace(nextBoard)) {
             disableBoardWinner(nextBoard)
-            firebaseService.setNextBoard(10)
-            firebaseService.setNextField(nextField(10))
+            firebaseService.setNextBoard(10, FirebasePatches.nextBoard)
+            firebaseService.setNextField(nextField(10), FirebasePatches.nextField)
             buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
         } else if (nextBoard == 10) {
             buttonArrWithArr.forEachIndexed { i, _ -> enableBoardButtons(i) }
@@ -291,13 +290,13 @@ class SuperTicTacToe : AppCompatActivity() {
             if (gameBoard.checkRightPlace(boardIndex)) {
                 Log.d("ooo", "chacking======${gameBoard.checkRightPlace(boardIndex)}")
                 disableBoardWinner(boardIndex)
-                firebaseService.setNextBoard(10)
-                firebaseService.setNextField(nextField(10))
+                firebaseService.setNextBoard(10, FirebasePatches.nextBoard)
+                firebaseService.setNextField(nextField(10), FirebasePatches.nextField)
             } else {
                 button.setOnClickListener {
                     updateBoard(boardIndex, index, button)
-                    firebaseService.setNextBoard(index)
-                    firebaseService.setNextField(nextField(index))
+                    firebaseService.setNextBoard(index, FirebasePatches.nextBoard)
+                    firebaseService.setNextField(nextField(index), FirebasePatches.nextField)
                 }
             }
         }
@@ -313,9 +312,9 @@ class SuperTicTacToe : AppCompatActivity() {
             if (listBD[boardIndex][index] == 0) {
                 val currentPlayer = if (!step) 2 else 1
                 listBD[boardIndex][index] = currentPlayer
-                firebaseService.setStepSuper(!step)
+                firebaseService.setStepSuper(!step, FirebasePatches.stepSuper)
                 button.text = if (step) "X" else "O"
-                firebaseService.setBoardStateSuper(listBD)
+                firebaseService.setBoardStateSuper(listBD, FirebasePatches.boardStateSuper)
             }
         }
     }
@@ -340,17 +339,17 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun setupFirebaseListenerAndChecker() {
-        val databaseReference = database.getReference("Stat")
+        val databaseReference = database.getReference(FirebasePatches.refSuper)
 
         firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val boardState = dataSnapshot.child("data").getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}) ?: MutableList(9) { MutableList(9) { 0 } }
-                val nextBoard = dataSnapshot.child("prevStep").getValue(Int::class.java) ?: 10
+                val boardState = dataSnapshot.child(FirebasePatches.data).getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}) ?: MutableList(9) { MutableList(9) { 0 } }
+                val nextBoard = dataSnapshot.child(FirebasePatches.prevStep).getValue(Int::class.java) ?: 10
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
-                firebaseService.setWinSuper(gameBoard.getWinListSuper())
+                firebaseService.setWinSuper(gameBoard.getWinListSuper(), FirebasePatches.winSuper)
                 handleBoardUpdates(nextBoard)
-                firebaseService.setNextField(nextField(nextBoard))
+                firebaseService.setNextField(nextField(nextBoard), FirebasePatches.nextField)
                 disableButtonsIsNotNull(boardState)
                 Log.d("ooo", "boardState=========$boardState")
                 Log.d("ooo", "nextBoard=========$nextBoard")
@@ -376,7 +375,7 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun resetGame() {
-        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } })
+        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } }, FirebasePatches.boardStateSuper)
         buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(this, it) }
     }
 

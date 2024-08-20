@@ -3,9 +3,9 @@ package com.exemple.ticktacktoe
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.exemple.ticktacktoe.databinding.ActivityMainBinding
-import com.exemple.ticktacktoe.ui.theme.SimpleTicTacToe
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         binding.bPlaySimple.setOnClickListener {
             val intent = Intent(this, SimpleTicTacToe::class.java)
             startActivity(intent)
+
         }
         binding.bPlaySuper.setOnClickListener {
             val intent = Intent(this, SuperTicTacToe::class.java)
