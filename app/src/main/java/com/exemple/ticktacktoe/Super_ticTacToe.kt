@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
 import com.exemple.ticktacktoe.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
@@ -28,6 +29,8 @@ class SuperTicTacToe : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySuperTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+//        replaceFragment(chouseServer())
 
         binding.bComeBackSuper.setOnClickListener {
             firebaseService.setExitCode(1, FirebasePatches.exitCode)
@@ -149,20 +152,25 @@ class SuperTicTacToe : AppCompatActivity() {
     private fun initialization() {
         firebaseService.setExitCode(0, FirebasePatches.exitCode)
         exitListeners()
-        firebaseService.setNextField(MutableList(9) {0}, FirebasePatches.nextField)
-        firebaseService.setWinSuper(MutableList(9) {0}, FirebasePatches.winSuper)
+        firebaseService.setNextField(MutableList(9) { 0 }, FirebasePatches.nextField)
+        firebaseService.setWinSuper(MutableList(9) { 0 }, FirebasePatches.winSuper)
 //        restartListeners()
-        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } }, FirebasePatches.boardStateSuper)
+        firebaseService.setBoardStateSuper(
+            MutableList(9) { MutableList(9) { 0 } },
+            FirebasePatches.boardStateSuper
+        )
         setupFirebaseListenerAndChecker()
         firebaseService.setNextBoard(10, FirebasePatches.nextBoard)
         firebaseService.setStepSuper(true, FirebasePatches.stepSuper)
         resetGame()
     }
+
     private fun exitWithActivity() {
         removeListeners() // Видалення слухачів
 //        clearDataFromFirebase() // Очищення даних
         finish() // Завершення активності
     }
+
     private fun clearDataFromFirebase() {
         val databaseReference = database.getReference(FirebasePatches.refSuper)
         databaseReference.removeValue().addOnCompleteListener { task ->
@@ -174,12 +182,13 @@ class SuperTicTacToe : AppCompatActivity() {
         }
     }
 
-    private fun exitListeners(){
+    private fun exitListeners() {
         firebaseService.getExitCode(FirebasePatches.exitCode) { code ->
             if (code == 1)
                 exitWithActivity()
         }
     }
+
     private fun removeListeners() {
         val databaseReference = database.getReference(FirebasePatches.refSuper)
         boardStateListener?.let {
@@ -211,7 +220,7 @@ class SuperTicTacToe : AppCompatActivity() {
                     continue
                 }
 
-                buttonArrWithArr[j].forEachIndexed { _ , button ->
+                buttonArrWithArr[j].forEachIndexed { _, button ->
                     gameBoard.setStrokeOnButtonOn(
                         button,
                         this
@@ -224,6 +233,7 @@ class SuperTicTacToe : AppCompatActivity() {
     private fun handleBoardUpdates(nextBoard: Int) {
         setupButtonListeners(nextBoard)
     }
+
     private fun setupButtonListeners(nextBoard: Int) {
         disableAllButtons()
         if (gameBoard.checkRightPlace(nextBoard)) {
@@ -301,6 +311,7 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
+
     private fun restartListeners() {
         removeListeners()
         setupFirebaseListenerAndChecker()
@@ -318,15 +329,17 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
+
     private fun getBoardState(callback: (MutableList<MutableList<Int>>, Boolean) -> Unit) {
-        val databaseReference = database.getReference("Stat/data")
+        val databaseReference = database.getReference(FirebasePatches.boardStateSuper)
 
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t = object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { MutableList(9) { 0 } }
                 val gameStatus = firebaseService.getStepSuper(boardState)
-                binding.textIsNextX.text = if(firebaseService.getStepSuper(boardState)) "next step X" else "next step O"
+                binding.textIsNextX.text =
+                    if (firebaseService.getStepSuper(boardState)) "next step X" else "next step O"
 
                 callback(boardState, gameStatus)
             }
@@ -343,8 +356,11 @@ class SuperTicTacToe : AppCompatActivity() {
 
         firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val boardState = dataSnapshot.child(FirebasePatches.data).getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {}) ?: MutableList(9) { MutableList(9) { 0 } }
-                val nextBoard = dataSnapshot.child(FirebasePatches.prevStep).getValue(Int::class.java) ?: 10
+                val boardState = dataSnapshot.child(FirebasePatches.data)
+                    .getValue(object : GenericTypeIndicator<MutableList<MutableList<Int>>>() {})
+                    ?: MutableList(9) { MutableList(9) { 0 } }
+                val nextBoard =
+                    dataSnapshot.child(FirebasePatches.prevStep).getValue(Int::class.java) ?: 10
                 updateUI(boardState)
                 gameBoard.checkWinSuper(boardState, binding)
                 firebaseService.setWinSuper(gameBoard.getWinListSuper(), FirebasePatches.winSuper)
@@ -375,11 +391,14 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun resetGame() {
-        firebaseService.setBoardStateSuper(MutableList(9) { MutableList(9) { 0 } }, FirebasePatches.boardStateSuper)
+        firebaseService.setBoardStateSuper(
+            MutableList(9) { MutableList(9) { 0 } },
+            FirebasePatches.boardStateSuper
+        )
         buttonArrAll.forEach { gameBoard.setBackgroundButtonsSuper(this, it) }
     }
 
-//    private fun handleWin(player: String, winCode: Int) {
+    //    private fun handleWin(player: String, winCode: Int) {
 //        binding.TextWin.text =  getString(R.string.winText, player)
 //        binding.TextWin.setTextColor(ContextCompat.getColor(this, R.color.green))
 //        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
@@ -391,5 +410,11 @@ class SuperTicTacToe : AppCompatActivity() {
 //        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
 //        firebaseService.setWinSuper(0)
 //    }
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(binding.fragmentContainerView.id, fragment)
+        fragmentTransaction.commit()
+    }
 }
 

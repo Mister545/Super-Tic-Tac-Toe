@@ -65,9 +65,9 @@
         android:layout_height="55dp"
         android:layout_marginTop="150dp"
         android:background="@drawable/button_main"
-        android:text="Play Simple"
+        android:text="Choose Server"
         android:textColor="@color/white"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/TicTacToeText"
         app:layout_constraintStart_toStartOf="@+id/TicTacToeText"
         app:layout_constraintTop_toBottomOf="@+id/TicTacToeText" />
@@ -92,26 +92,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textPlayOnline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play Online"
-        android:textColor="@color/main_orange_text"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/chip"
-        app:layout_constraintEnd_toStartOf="@+id/chip"
-        app:layout_constraintTop_toTopOf="@+id/chip" />
+<!--    <TextView-->
+<!--        android:id="@+id/textPlayOnline"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Play Online"-->
+<!--        android:textColor="@color/main_orange_text"-->
+<!--        android:textSize="20sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/chip"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/chip"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/chip" />-->
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/chip"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintEnd_toEndOf="@+id/bPlaySuper"
-        app:layout_constraintHorizontal_bias="0.736"
-        app:layout_constraintStart_toStartOf="@+id/bPlaySuper"
-        app:layout_constraintTop_toBottomOf="@+id/bPlaySuper" />
+<!--    <androidx.appcompat.widget.SwitchCompat-->
+<!--        android:id="@+id/chip"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_marginTop="52dp"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/bPlaySuper"-->
+<!--        app:layout_constraintHorizontal_bias="0.736"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/bPlaySuper"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/bPlaySuper" />-->
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

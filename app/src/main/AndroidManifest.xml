@@ -29,6 +29,9 @@
         <activity android:name=".SuperTicTacToe">
             <!-- Налаштування для активності, якщо є -->
         </activity>
+        <activity android:name=".ChooseServerActivity">
+            <!-- Налаштування для активності, якщо є -->
+        </activity>
     </application>
 
 </manifest>
