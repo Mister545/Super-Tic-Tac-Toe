@@ -1,9 +1,11 @@
 package com.exemple.ticktacktoe
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
 import com.exemple.ticktacktoe.Game.FirebaseService
@@ -22,6 +24,7 @@ class SuperTicTacToe : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance()
     private val firebaseService = FirebaseService()
     private val gameBoard = GameBoard()
+    private val servers = Servers()
     private var firebaseListener: ValueEventListener? = null
     private var boardStateListener: ValueEventListener? = null
 
@@ -32,23 +35,31 @@ class SuperTicTacToe : AppCompatActivity() {
 
         firebaseService.getPlayersNumSuper(FirebasePatches.playersNumSuper){
             if (Servers.ServersSuper.serverIsStarting(FirebasePatches.playersNumSuper, it)){
-                setupButtons()
                 initialization()
+                serverWaitingPlayer()
             }
         }
 
 
+
+
         binding.bComeBackSuper.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             firebaseService.setExitCode(1, FirebasePatches.exitCodeSuper)
+
+            firebaseService.getPlayersNumSuper(FirebasePatches.playersNumSuper) {
+                firebaseService.setPlayersNumSuper(it - 1, FirebasePatches.playersNumSuper)
+            }
+            removeFragment()
         }
-//        setupButtons()
+        setupButtons()
 //        initialization()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         removeListeners()
-        clearDataFromFirebase()
     }
 
     private fun setupButtons() {
@@ -186,6 +197,21 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
+    private fun serverWaitingPlayer(){
+        firebaseService.getPlayersNumSuperEvent(FirebasePatches.playersNumSuper) {
+
+            val isWaitingPlayer = servers.waitingPlayer(FirebasePatches.playersNumSuper, 2, 1){
+                if (!it) {
+                    replaceFragment(FragmentWaitingPlayersSuper())
+                    disableAllButtons()
+                } else {
+                    enableAllButtons()
+                    removeFragment()
+                }
+            }
+            Log.d("ooo", isWaitingPlayer.toString())
+        }
+    }
 
     private fun exitListeners() {
         firebaseService.getExitCode(FirebasePatches.exitCodeSuper) { code ->
@@ -282,7 +308,13 @@ class SuperTicTacToe : AppCompatActivity() {
 
     private fun disableAllButtons() {
 
-        buttonArrWithArr.flatten().forEach { it.isClickable = false }
+        buttonArrWithArr.flatten().forEach { it.isClickable = false
+            binding.bComeBackSuper.isClickable = false}
+    }
+    private fun enableAllButtons() {
+
+        buttonArrWithArr.flatten().forEach { it.isClickable = true
+        binding.bComeBackSuper.isClickable = true}
     }
 
     private fun disableButtonsIsNotNull(array: MutableList<MutableList<Int>>) {
@@ -408,11 +440,33 @@ class SuperTicTacToe : AppCompatActivity() {
 //        binding.TextWin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f)
 //        firebaseService.setWinSuper(0)
 //    }
-    private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(binding.fragmentContainerView.id, fragment)
-        fragmentTransaction.commit()
+    private fun replaceFragment(fragment: DialogFragment) {
+        // Перевірка чи активність не знищена і не завершується
+        if (!isFinishing && !supportFragmentManager.isDestroyed) {
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+
+            // Перевірка чи транзакція безпечна (стан активності не був збережений)
+            if (!supportFragmentManager.isStateSaved) {
+                fragmentTransaction.replace(binding.fragmentContainerView.id, fragment)
+                fragmentTransaction.commit()
+            } else {
+                // Якщо стан активності був збережений, використовуйте commitAllowingStateLoss
+                fragmentTransaction.replace(binding.fragmentContainerView.id, fragment)
+                fragmentTransaction.commitAllowingStateLoss()
+            }
+        } else {
+            // Логування або інші дії, якщо транзакція не може бути виконана
+            println("Замінити фрагмент неможливо: активність знищена або завершується")
+        }
+    }
+
+    private fun removeFragment() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView)
+        if (fragment != null && !supportFragmentManager.isStateSaved) {
+            supportFragmentManager.beginTransaction()
+                .remove(fragment)
+                .commit()
+        }
     }
 }
 

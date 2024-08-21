@@ -146,14 +146,22 @@ class Servers {
             return result
         }
     }
-    fun waitingPlayer(patch: String, codeActivity: Int, callback: (Boolean) -> Unit) {
+    fun waitingPlayer(patch: String, codeActivity: Int, getNum: Int, callback: (Boolean) -> Unit) {
         if (codeActivity == 0) {
-            firebaseService.getPlayersNumSimple(patch) {
-                callback(it == 2)
+            firebaseService.getPlayersNumSimple2(patch) {
+                if (it == null){
+                    println("ldkmv")
+                }else {
+                    callback(it == 2)
+                }
             }
         } else {
             firebaseService.getPlayersNumSuper(patch) {
-                callback(it == 2)
+                if (it == null){
+                    println("ldkmv")
+                }else {
+                    callback(it == 2)
+                }
             }
         }
     }

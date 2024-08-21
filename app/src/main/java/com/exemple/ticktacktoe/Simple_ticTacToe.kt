@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import com.exemple.ticktacktoe.databinding.ActivitySimpleTicTacToeBinding
 import com.exemple.ticktacktoe.Game.FirebaseService
 import com.google.firebase.database.DataSnapshot
@@ -33,7 +34,7 @@ class SimpleTicTacToe : AppCompatActivity() {
         buttonArr = arrayListOf(
             binding.button1, binding.button2, binding.button3,
             binding.button4, binding.button5, binding.button6,
-            binding.button7, binding.button8, binding.button9
+            binding.button7, binding.button8, binding.button9,
         )
 
         firebaseService.getPlayersNumSimple(FirebasePatches.playersNum){
@@ -48,12 +49,20 @@ class SimpleTicTacToe : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             firebaseService.setExitCode(1, FirebasePatches.exitCodeSimple)
+
+            firebaseService.getPlayersNumSimple(FirebasePatches.playersNum) {
+                firebaseService.setPlayersNum(it - 1, FirebasePatches.playersNum)
+            }
+            removeFragment()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        firebaseService.setBoardStateSimple(MutableList(9){0}, FirebasePatches.boardStateSimple)
+        firebaseService.setStep(true, FirebasePatches.stepSimple)
         removeListeners()
+
     }
     private fun initialization() {
         firebaseService.setExitCode(0, FirebasePatches.exitCodeSimple)
@@ -72,18 +81,23 @@ class SimpleTicTacToe : AppCompatActivity() {
     private fun exitWithActivity() {
         removeListeners()
         finish()
-
     }
     private fun removeListeners() {
         val databaseReference = database.getReference(FirebasePatches.refSimple)
         firebaseListener?.let {
             databaseReference.removeEventListener(it)
         }
+        database.getReference(FirebasePatches.playersNum).removeEventListener(firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum) {})
 
+        val exitCodeListener: ValueEventListener? = null
+
+        exitCodeListener?.let { listener ->
+            firebaseService.removeListener(FirebasePatches.statSimpleData, listener)
+        }
         firebaseListener = null
     }
     private fun clearDataFromFirebase() {
-        val databaseReference = database.getReference(FirebasePatches.refSimple)
+        val databaseReference = database.getReference(FirebasePatches.boardStateSuper)
         databaseReference.removeValue().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d("Firebase", "Data removed successfully.")
@@ -112,45 +126,30 @@ class SimpleTicTacToe : AppCompatActivity() {
     }
     private fun serverWaitingPlayer(){
         firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum) {
-            val isWaitingPlayer = servers.waitingPlayer(FirebasePatches.playersNum, 0){
+            val isWaitingPlayer = servers.waitingPlayer(FirebasePatches.playersNum, 0, 0){
                 if (!it) {
-                    binding.TicTacToeText.text = "wait"
+                    replaceFragment(FragmentWaitingPlayersSimple())
+                    disableAllButtons()
                 } else {
-                    binding.TicTacToeText.text = "Start"
+                    removeFragment()
+                    enableAllButtons()
                 }
             }
             Log.d("ooo", isWaitingPlayer.toString())
         }
-
     }
 
 
     private fun disableAllButtons() {
-        buttonArr.forEach { it.isClickable = false }
+        buttonArr.forEach { it.isClickable = false
+        binding.bComeBackSimple.isClickable = false}
     }
     private fun enableAllButtons() {
-        buttonArr.forEach { it.isClickable = true }
+        buttonArr.forEach { it.isClickable = true
+        binding.bComeBackSimple.isClickable = true}
     }
 
-//    private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
-//        val databaseReference = database.getReference(FirebasePatches.getBoardStateSimple())
-//        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val t = object : GenericTypeIndicator<MutableList<Int>>() {}
-//                val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
-//                val gameStatus = firebaseService.getStep(boardState)
-//                gameBoard.updateBoardAllSimple(this@SimpleTicTacToe, boardState, buttonArr)
-//
-//                callback(boardState, gameStatus)
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                callback(MutableList(9) { 0 }, false)
-//
-//                Log.e("ooo", "Error: ${error.message}")
-//            }
-//        })
-//    }
+
 
     private fun getBoardState(callback: (MutableList<Int>, Boolean) -> Unit) {
         val databaseReference = database.getReference(FirebasePatches.refSimple)
@@ -226,5 +225,33 @@ class SimpleTicTacToe : AppCompatActivity() {
             button.text = ""
         }
         initialization()
+    }
+    private fun replaceFragment(fragment: DialogFragment) {
+        // Перевірка чи активність не знищена і не завершується
+        if (!isFinishing && !supportFragmentManager.isDestroyed) {
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+
+            // Перевірка чи транзакція безпечна (стан активності не був збережений)
+            if (!supportFragmentManager.isStateSaved) {
+                fragmentTransaction.replace(binding.fragmentContainerView3.id, fragment)
+                fragmentTransaction.commit()
+            } else {
+                // Якщо стан активності був збережений, використовуйте commitAllowingStateLoss
+                fragmentTransaction.replace(binding.fragmentContainerView3.id, fragment)
+                fragmentTransaction.commitAllowingStateLoss()
+            }
+        } else {
+            // Логування або інші дії, якщо транзакція не може бути виконана
+            println("Замінити фрагмент неможливо: активність знищена або завершується")
+        }
+    }
+
+    private fun removeFragment() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView3)
+        if (fragment != null && !supportFragmentManager.isStateSaved) {
+            supportFragmentManager.beginTransaction()
+                .remove(fragment)
+                .commit()
+        }
     }
 }

@@ -41,7 +41,7 @@
                 android:id="@+id/button1"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -49,7 +49,7 @@
                 android:id="@+id/button2"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -57,7 +57,7 @@
                 android:id="@+id/button3"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
         </TableRow>
@@ -70,7 +70,7 @@
                 android:id="@+id/button4"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -78,7 +78,7 @@
                 android:id="@+id/button5"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -86,7 +86,7 @@
                 android:id="@+id/button6"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
         </TableRow>
@@ -99,7 +99,7 @@
                 android:id="@+id/button7"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -107,7 +107,7 @@
                 android:id="@+id/button8"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
 
@@ -115,7 +115,7 @@
                 android:id="@+id/button9"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@color/white"
+                android:background="@drawable/button_background_tic_tac_toe_simple"
                 android:text=""
                 android:textColor="@color/white" />
         </TableRow>
@@ -133,5 +133,15 @@
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="@+id/tableLayout"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView3"
+        android:name="com.exemple.ticktacktoe.FragmentWaitingPlayersSimple"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,29 @@ import com.google.firebase.database.*
 
 class FirebaseService {
 //    private val constFirebasePackages = constFirebasePackages()
-    var firebaseListener: ValueEventListener? = null
+//    var firebaseListener: ValueEventListener? = null
+fun removeListener(path: String, listener: ValueEventListener) {
+    val databaseReference = database.getReference(path)
+    databaseReference.removeEventListener(listener)
+}
+
+    fun getPlayersNumSimple2( path: String, callback: (Int) -> Unit) {
+        val databaseReference = database.getReference(path)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.getValue(Int::class.java) == null){
+                    println()
+                }else {
+                    val playerNum = dataSnapshot.getValue(Int::class.java)!!
+                    callback(playerNum)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        })
+    }
 
     private val database = FirebaseDatabase.getInstance()
 
@@ -41,37 +63,28 @@ class FirebaseService {
     fun setWinSuper(win: MutableList<Int>, path: String) {
         database.getReference(path).setValue(win)
     }
-    fun getExitCode( path: String, callback: (Int) -> Unit) {
-        val databaseReference = database.getReference(path)
-        databaseReference.addValueEventListener (object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val exitCode = dataSnapshot.getValue(Int::class.java)!!
+fun getExitCode(path: String, callback: (Int) -> Unit): ValueEventListener {
+    val firebaseListener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val exitCode = dataSnapshot.getValue(Int::class.java)
+            if (exitCode != null) {
                 callback(exitCode)
-            }
+            } else {
+                // Обробка випадку, коли дані відсутні або є null
+                println("Дані відсутні або є null")
+            }        }
 
-            override fun onCancelled(error: DatabaseError) {
-                println("Помилка зчитування з Firebase: ${error.message}")
-            }
-        })
+        override fun onCancelled(error: DatabaseError) {
+            println("Помилка зчитування з Firebase: ${error.message}")
+        }
     }
-    fun getPlayersNumSimple( path: String, callback: (Int) -> Unit) {
-        val databaseReference = database.getReference(path)
-        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.getValue(Int::class.java) == null){
-                    setPlayersNum(0, FirebasePatches.playersNum)
-                    callback(0)
-                }else {
-                    val playerNum = dataSnapshot.getValue(Int::class.java)!!
-                    callback(playerNum)
-                }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                println("Помилка зчитування з Firebase: ${error.message}")
-            }
-        })
-    }
+    val databaseReference = database.getReference(path)
+    databaseReference.addValueEventListener(firebaseListener)
+
+    return firebaseListener
+}
+
     fun getPlayersNumSuper( path: String, callback: (Int) -> Unit) {
         val databaseReference = database.getReference(path)
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -90,9 +103,52 @@ class FirebaseService {
             }
         })
     }
-    fun getPlayersNumSimpleEvent( path: String, callback: (Int) -> Unit) {
+    fun getPlayersNumSimpleEvent(path: String, callback: (Int) -> Unit): ValueEventListener {
+        val firebaseListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val playerNum = dataSnapshot.getValue(Int::class.java)
+                if (playerNum == null) {
+//                    setPlayersNum(0, FirebasePatches.playersNum)
+                }else
+                callback(playerNum)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        }
+
+
         val databaseReferenceForNumSimple = database.getReference(path)
-        firebaseListener = object : ValueEventListener {
+        databaseReferenceForNumSimple.addValueEventListener(firebaseListener)
+
+        return firebaseListener
+    }
+    fun getPlayersNumSuperEvent(path: String, callback: (Int) -> Unit): ValueEventListener {
+        val firebaseListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val playerNum = dataSnapshot.getValue(Int::class.java)
+                if (playerNum == null) {
+//                    setPlayersNum(0, FirebasePatches.playersNum)
+                }else
+                callback(playerNum)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        }
+
+
+        val databaseReferenceForNumSuper = database.getReference(path)
+        databaseReferenceForNumSuper.addValueEventListener(firebaseListener)
+
+        return firebaseListener
+    }
+
+    fun getPlayersNumSimple( path: String, callback: (Int) -> Unit) {
+        val databaseReference = database.getReference(path)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue(Int::class.java) == null){
                     setPlayersNum(0, FirebasePatches.playersNum)
@@ -106,9 +162,9 @@ class FirebaseService {
             override fun onCancelled(error: DatabaseError) {
                 println("Помилка зчитування з Firebase: ${error.message}")
             }
-        }
-        databaseReferenceForNumSimple.addValueEventListener(firebaseListener!!)
+        })
     }
+
     fun getStep(list: MutableList<Int>) : Boolean {
         var x = 0
         var o = 0
