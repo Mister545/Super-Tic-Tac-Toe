@@ -12,6 +12,9 @@ class FirebaseService {
     fun setPlayersNum(playersNum: Int, path: String){
         database.getReference(path).setValue(playersNum)
     }
+    fun setPlayersNumSuper(playersNum: Int, path: String){
+        database.getReference(path).setValue(playersNum)
+    }
     fun setExitCode(code: Int, path: String){
         database.getReference(path).setValue(code)
     }
@@ -57,6 +60,24 @@ class FirebaseService {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.getValue(Int::class.java) == null){
                     setPlayersNum(0, FirebasePatches.playersNum)
+                    callback(0)
+                }else {
+                    val playerNum = dataSnapshot.getValue(Int::class.java)!!
+                    callback(playerNum)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        })
+    }
+    fun getPlayersNumSuper( path: String, callback: (Int) -> Unit) {
+        val databaseReference = database.getReference(path)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.getValue(Int::class.java) == null){
+                    setPlayersNumSuper(0, FirebasePatches.playersNumSuper)
                     callback(0)
                 }else {
                     val playerNum = dataSnapshot.getValue(Int::class.java)!!

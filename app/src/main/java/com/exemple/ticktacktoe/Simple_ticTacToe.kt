@@ -22,7 +22,8 @@ class SimpleTicTacToe : AppCompatActivity() {
     private val gameBoard = GameBoard()
     val firebaseService = FirebaseService()
     private val database = FirebaseDatabase.getInstance()
-    private lateinit var firebaseListener: ValueEventListener
+    private var firebaseListener: ValueEventListener? = null
+    private val servers = Servers()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,30 +39,58 @@ class SimpleTicTacToe : AppCompatActivity() {
         firebaseService.getPlayersNumSimple(FirebasePatches.playersNum){
             if (Servers.ServersSimple.serverIsStarting(FirebasePatches.playersNum, it)){
                 initialization()
+                serverWaitingPlayer()
             }
         }
-        firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum){
 
-        }
 
         binding.bComeBackSimple.setOnClickListener{
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            firebaseService.setExitCode(1, FirebasePatches.exitCodeSimple)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        val databaseReference = database.getReference(FirebasePatches.refSimple)
-        databaseReference.removeEventListener(firebaseListener)
+        removeListeners()
     }
-
     private fun initialization() {
-
+        firebaseService.setExitCode(0, FirebasePatches.exitCodeSimple)
+        exitListeners()
         setupButtonListeners()
         firebaseService.setStep(true, FirebasePatches.stepSimple)
         resetGame()
         setupFirebaseListener()  // Налаштування постійного слухача змін
+    }
+    private fun exitListeners() {
+        firebaseService.getExitCode(FirebasePatches.exitCodeSimple) { code ->
+            if (code == 1)
+                exitWithActivity()
+        }
+    }
+    private fun exitWithActivity() {
+        removeListeners()
+        finish()
+
+    }
+    private fun removeListeners() {
+        val databaseReference = database.getReference(FirebasePatches.refSimple)
+        firebaseListener?.let {
+            databaseReference.removeEventListener(it)
+        }
+
+        firebaseListener = null
+    }
+    private fun clearDataFromFirebase() {
+        val databaseReference = database.getReference(FirebasePatches.refSimple)
+        databaseReference.removeValue().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase", "Data removed successfully.")
+            } else {
+                Log.e("Firebase", "Failed to remove data.", task.exception)
+            }
+        }
     }
     private fun setupButtonListeners() {
         for ((index, button) in buttonArr.withIndex()) {
@@ -70,17 +99,6 @@ class SimpleTicTacToe : AppCompatActivity() {
             }
         }
     }
-//    private fun serverIsStarting(patch: String){
-//        firebaseService.getPlayersNumSimple(patch) {
-//            if(Servers.ServersSimple.rightServer(it)){
-//                firebaseService.setPlayersNum(it+1, FirebasePatches.playersNum)
-//                initialization()
-//            }else
-//                serverIsStarting(patch)
-//                firebaseService.setPlayersNum(it+1, FirebasePatches.playersNum)
-//        }
-//    }
-
     private fun updateBoard(index: Int, button: Button) {
         getBoardState { listBD, step ->
             if (listBD[index] == 0) {
@@ -91,6 +109,19 @@ class SimpleTicTacToe : AppCompatActivity() {
                 firebaseService.setBoardStateSimple(listBD, FirebasePatches.boardStateSimple)
             }
         }
+    }
+    private fun serverWaitingPlayer(){
+        firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum) {
+            val isWaitingPlayer = servers.waitingPlayer(FirebasePatches.playersNum, 0){
+                if (!it) {
+                    binding.TicTacToeText.text = "wait"
+                } else {
+                    binding.TicTacToeText.text = "Start"
+                }
+            }
+            Log.d("ooo", isWaitingPlayer.toString())
+        }
+
     }
 
 
@@ -126,7 +157,6 @@ class SimpleTicTacToe : AppCompatActivity() {
 
         firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val playerNum = dataSnapshot.child(FirebasePatches.playersNumPatch).getValue(Int::class.java)
                 val boardState = dataSnapshot.child(FirebasePatches.data)
                     .getValue(object : GenericTypeIndicator<MutableList<Int>>() {})
                 val gameStatus = firebaseService.getStep(boardState!!)
@@ -138,7 +168,7 @@ class SimpleTicTacToe : AppCompatActivity() {
                 Log.e("ooo", "Error: ${error.message}")
             }
         }
-        databaseReference.addValueEventListener(firebaseListener)
+        databaseReference.addValueEventListener(firebaseListener!!)
     }
 
     private fun setupFirebaseListener() {
@@ -159,7 +189,7 @@ class SimpleTicTacToe : AppCompatActivity() {
                 Log.e("ooo", "Error: ${error.message}")
             }
         }
-        databaseReference.addValueEventListener(firebaseListener)
+        databaseReference.addValueEventListener(firebaseListener!!)
     }
 
 

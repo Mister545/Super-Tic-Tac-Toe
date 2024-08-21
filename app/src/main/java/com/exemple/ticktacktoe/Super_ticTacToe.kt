@@ -30,18 +30,25 @@ class SuperTicTacToe : AppCompatActivity() {
         binding = ActivitySuperTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        replaceFragment(chouseServer())
+        firebaseService.getPlayersNumSuper(FirebasePatches.playersNumSuper){
+            if (Servers.ServersSuper.serverIsStarting(FirebasePatches.playersNumSuper, it)){
+                setupButtons()
+                initialization()
+            }
+        }
+
 
         binding.bComeBackSuper.setOnClickListener {
-            firebaseService.setExitCode(1, FirebasePatches.exitCode)
+            firebaseService.setExitCode(1, FirebasePatches.exitCodeSuper)
         }
-        setupButtons()
-        initialization()
+//        setupButtons()
+//        initialization()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         removeListeners()
+        clearDataFromFirebase()
     }
 
     private fun setupButtons() {
@@ -150,11 +157,10 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun initialization() {
-        firebaseService.setExitCode(0, FirebasePatches.exitCode)
+        firebaseService.setExitCode(0, FirebasePatches.exitCodeSuper)
         exitListeners()
         firebaseService.setNextField(MutableList(9) { 0 }, FirebasePatches.nextField)
         firebaseService.setWinSuper(MutableList(9) { 0 }, FirebasePatches.winSuper)
-//        restartListeners()
         firebaseService.setBoardStateSuper(
             MutableList(9) { MutableList(9) { 0 } },
             FirebasePatches.boardStateSuper
@@ -166,9 +172,8 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun exitWithActivity() {
-        removeListeners() // Видалення слухачів
-//        clearDataFromFirebase() // Очищення даних
-        finish() // Завершення активності
+        removeListeners()
+        finish()
     }
 
     private fun clearDataFromFirebase() {
@@ -183,7 +188,7 @@ class SuperTicTacToe : AppCompatActivity() {
     }
 
     private fun exitListeners() {
-        firebaseService.getExitCode(FirebasePatches.exitCode) { code ->
+        firebaseService.getExitCode(FirebasePatches.exitCodeSuper) { code ->
             if (code == 1)
                 exitWithActivity()
         }
@@ -261,7 +266,7 @@ class SuperTicTacToe : AppCompatActivity() {
                     arr[index] = empty
                 }
             }
-            Log.d("ooo", "Updated arr: $arr") // Логування оновленого масиву
+            Log.d("ooo", "Updated arr: $arr")
             arr
         } else {
             mutableListOf(nextBoard)
@@ -311,13 +316,6 @@ class SuperTicTacToe : AppCompatActivity() {
             }
         }
     }
-
-    private fun restartListeners() {
-        removeListeners()
-        setupFirebaseListenerAndChecker()
-    }
-
-
     private fun updateBoard(boardIndex: Int, index: Int, button: Button) {
         getBoardState { listBD, step ->
             if (listBD[boardIndex][index] == 0) {
