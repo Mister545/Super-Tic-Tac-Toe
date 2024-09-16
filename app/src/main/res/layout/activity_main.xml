@@ -50,12 +50,11 @@
         android:id="@+id/bPlaySuper"
         android:layout_width="250dp"
         android:layout_height="55dp"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/button_main"
         android:text="Play Super"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/bPlaySimple"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/bPlaySimple"
         app:layout_constraintTop_toBottomOf="@+id/bPlaySimple" />
 
@@ -63,14 +62,29 @@
         android:id="@+id/bPlaySimple"
         android:layout_width="250dp"
         android:layout_height="55dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="124dp"
         android:background="@drawable/button_main"
         android:text="Play Simple"
         android:textColor="@color/white"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@+id/TicTacToeText"
+        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="@+id/TicTacToeText"
         app:layout_constraintTop_toBottomOf="@+id/TicTacToeText" />
+
+    <Button
+        android:id="@+id/bRooms"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_main"
+        android:text="Create Room"
+        android:textColor="@color/white"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="@+id/bPlaySimple"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/bPlaySimple"
+        app:layout_constraintTop_toBottomOf="@+id/bPlaySuper" />
 
     <FrameLayout
         android:id="@+id/fragmentConteinerSimple"
@@ -90,7 +104,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/textPlayOnline"
@@ -108,19 +124,34 @@
         android:id="@+id/chip"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintEnd_toEndOf="@+id/bPlaySuper"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/bRooms"
         app:layout_constraintHorizontal_bias="0.736"
-        app:layout_constraintStart_toStartOf="@+id/bPlaySuper"
-        app:layout_constraintTop_toBottomOf="@+id/bPlaySuper" />
+        app:layout_constraintStart_toStartOf="@+id/bRooms"
+        app:layout_constraintTop_toBottomOf="@+id/bRooms"
+        app:thumbTint="@color/white" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+    <ImageButton
+        android:id="@+id/imageButtonAccount"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@android:color/transparent"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_account_circle_24" />
+
+    <TextView
+        android:id="@+id/tvNameUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/imageButtonAccount"
+        app:layout_constraintStart_toStartOf="@+id/imageButtonAccount"
+        app:layout_constraintTop_toBottomOf="@+id/imageButtonAccount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

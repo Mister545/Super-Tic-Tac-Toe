@@ -26,7 +26,13 @@
         <activity android:name=".SimpleTicTacToe">
             <!-- Налаштування для активності, якщо є -->
         </activity>
+        <activity android:name=".OfflineSimple">
+            <!-- Налаштування для активності, якщо є -->
+        </activity>
         <activity android:name=".SuperTicTacToe">
+            <!-- Налаштування для активності, якщо є -->
+        </activity>
+        <activity android:name=".OfflineSuper">
             <!-- Налаштування для активності, якщо є -->
         </activity>
         <activity android:name=".ChooseServerActivity">

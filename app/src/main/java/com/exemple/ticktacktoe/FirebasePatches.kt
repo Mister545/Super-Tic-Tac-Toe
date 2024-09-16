@@ -3,6 +3,14 @@ package com.exemple.ticktacktoe
 object FirebasePatches {
 
     var servers = "Servers"             ////////
+    var users = "Users"
+    val room = "rooms"
+    val codeRoom = "0000000"
+
+    var signInRoom = "$servers/$room/$codeRoom"
+    var usersDataName = "${users}/name"
+
+    val rooms = "$servers/$room"
 
     var statSuperData = "ServerSuper"
     var statSimpleData = "ServerSimple"////////

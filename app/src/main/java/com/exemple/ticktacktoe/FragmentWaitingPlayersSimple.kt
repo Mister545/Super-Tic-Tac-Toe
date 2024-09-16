@@ -25,6 +25,14 @@ class FragmentWaitingPlayersSimple : DialogFragment() {
             firebaseService.setExitCode(1, FirebasePatches.exitCodeSimple)
             dismiss()
         }
+        firebaseService.getCodeRoom(FirebasePatches.rooms){ it, type->
+            if (isAdded && isVisible) {
+                requireActivity().runOnUiThread {
+                    val codeRoom = "$type : $it"
+                    binding.textView2.text = codeRoom
+                }
+            }
+        }
 
         return binding.root
     }

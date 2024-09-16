@@ -13,5 +13,7 @@
     <color name="main_orange_button">#E98C00</color>
     <color name="main_orange_text">#A96400</color>
     <color name="stroke_buttons">#A96400</color>
+    <color name="color_red">#FF1100</color>
+
 
 </resources>

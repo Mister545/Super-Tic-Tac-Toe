@@ -1,15 +1,23 @@
 package com.exemple.ticktacktoe.Game
 
+import android.util.Log
 import com.exemple.ticktacktoe.FirebasePatches
 import com.google.firebase.database.*
 
 class FirebaseService {
 //    private val constFirebasePackages = constFirebasePackages()
 //    var firebaseListener: ValueEventListener? = null
-fun removeListener(path: String, listener: ValueEventListener) {
+    private val database = FirebaseDatabase.getInstance()
+
+    fun removeListener(path: String, listener: ValueEventListener) {
     val databaseReference = database.getReference(path)
     databaseReference.removeEventListener(listener)
 }
+
+    fun setUserName(path: String, userUid: String, name: String?){
+        database.getReference(path).setValue(userUid)
+        database.getReference(path).child(userUid).child("name").setValue(name)
+    }
 
     fun getPlayersNumSimple2( path: String, callback: (Int) -> Unit) {
         val databaseReference = database.getReference(path)
@@ -28,8 +36,48 @@ fun removeListener(path: String, listener: ValueEventListener) {
             }
         })
     }
+    fun getPlayerName( path: String, callback: (String) -> Unit) {
+        val databaseReference = database.getReference(path)
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.getValue(String::class.java) == null){
+                    println()
+                }else {
+                    val playerName = dataSnapshot.getValue(String::class.java)!!
+                    Log.d("ooo", "playerName $playerName")
+                    callback(playerName)
+                }
+            }
 
-    private val database = FirebaseDatabase.getInstance()
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        })
+    }
+    fun getCodeRoom( path: String, callback: (Int, String) -> Unit) {
+        val databaseReference = database.getReference(path)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val result = dataSnapshot.value as? Map<String, Map<String, *>>  // Отримуємо карту з типами String
+                if (result == null) {
+                    callback(0, "0")
+                } else {
+                    result.forEach { (key, data) ->
+                        val serverSimpleName =
+                            data.keys.firstOrNull() // Отримуємо перший ключ, який може бути назвою ServerSimple
+
+                        callback(key.toInt(), serverSimpleName?.toString()!!)
+                    }
+                }
+                Log.d("ooo", "codeRoom: ${dataSnapshot.value}")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        })
+    }
+
 
     fun setPlayersNum(playersNum: Int, path: String){
         database.getReference(path).setValue(playersNum)

@@ -2,11 +2,118 @@ package com.exemple.ticktacktoe
 
 import android.util.Log
 import com.exemple.ticktacktoe.Game.FirebaseService
+import kotlin.random.Random
 
 
 class Servers {
     private val firebaseService = FirebaseService()
 
+    fun signInRoom(code: Int, callback: (Boolean, String) -> Unit) {
+
+        var servers = "Servers"             ////////
+        val room = "rooms"
+        val codeRoom = code
+
+        val signInRoom = "$servers/$room/$codeRoom"
+        val signRoomCode = "$servers/$room"
+
+        FirebasePatches.signInRoom = "$servers/$room/$codeRoom"
+
+        FirebasePatches.servers = signInRoom
+        servers = signInRoom
+        val rooms = "$servers/$room"
+
+        val statSuperData = "ServerSuper"
+        val statSimpleData = "ServerSimple"////////
+        val superr = "super"////////
+        val simple= "simple"////////
+        val data = "data"
+        val exitCodeData = "ExitCode"
+        val isNextXData = "isNextX"
+        val nextFieldData = "nextField"
+        val prevStepData = "prevStep"
+        val winPositionData = "winPosition"
+        val playersNumData = "playersNum"
+        val playersNumSuperData = "playersNum"
+
+        FirebasePatches.playersNum = "$servers/$statSimpleData/$playersNumData"
+        FirebasePatches.playersNumSuper = "$servers/$statSuperData/$playersNumSuperData"
+        FirebasePatches.playersNumSuperPatch = playersNumSuperData
+        FirebasePatches.playersNumPatch = playersNumData
+        FirebasePatches.statSimple = "$servers/$statSimpleData"
+        FirebasePatches.stepSimple = "$servers/$statSimpleData/$isNextXData"
+        FirebasePatches.stepSuper = "$servers/$statSuperData/$isNextXData"
+        FirebasePatches.nextField = "$servers/$statSuperData/$nextFieldData"
+        FirebasePatches.nextBoard = "$servers/$statSuperData/$prevStepData"
+        FirebasePatches.boardStateSimple = "$servers/$statSimpleData/$data"
+        FirebasePatches.boardStateSuper = "$servers/$statSuperData/$data"
+        FirebasePatches.winSuper = "$servers/$statSuperData/$winPositionData"
+        FirebasePatches.exitCodeSuper = "$servers/$statSuperData/$exitCodeData"
+        FirebasePatches.exitCodeSimple = "$servers/$statSimpleData/$exitCodeData"
+        FirebasePatches.setupFirebaseListener = "$servers/$statSimpleData/$data"
+        FirebasePatches.refSimple = "$servers/$statSimpleData"
+        FirebasePatches.refSuper = "$servers/$statSuperData"
+        FirebasePatches.prevStep = prevStepData
+
+
+        fun verifyCode(callback: (Boolean, String) -> Unit){
+            firebaseService.getCodeRoom(signRoomCode){ it, type->
+                if (it == 0) {
+                    callback(false, "_")
+                }else{
+                    if (code == it)
+                        callback(true, type)
+                    else
+                        callback(false, type)
+                }
+            }
+        }
+        verifyCode {it, type->
+            callback(it, type)
+        }
+    }
+    fun createRoom(random: Int) {
+
+        var servers = "Servers"             ////////
+        val room = "rooms"
+
+        val rooms = "$servers/$room"
+
+        FirebasePatches.servers = rooms
+        servers = rooms
+
+        val statSuperData = "ServerSuper"
+        val statSimpleData = "ServerSimple"////////
+        val superr = random////////
+        val simple= random ////////
+        val data = "data"
+        val exitCodeData = "ExitCode"
+        val isNextXData = "isNextX"
+        val nextFieldData = "nextField"
+        val prevStepData = "prevStep"
+        val winPositionData = "winPosition"
+        val playersNumData = "playersNum"
+        val playersNumSuperData = "playersNum"
+
+        FirebasePatches.playersNum = "$servers/$simple/$statSimpleData/$playersNumData"
+        FirebasePatches.playersNumSuper = "$servers/$superr/$statSuperData/$playersNumSuperData"
+        FirebasePatches.playersNumSuperPatch = playersNumSuperData
+        FirebasePatches.playersNumPatch = playersNumData
+        FirebasePatches.statSimple = "$servers/$simple/$statSimpleData"
+        FirebasePatches.stepSimple = "$servers/$simple/$statSimpleData/$isNextXData"
+        FirebasePatches.stepSuper = "$servers/$superr/$statSuperData/$isNextXData"
+        FirebasePatches.nextField = "$servers/$superr/$statSuperData/$nextFieldData"
+        FirebasePatches.nextBoard = "$servers/$superr/$statSuperData/$prevStepData"
+        FirebasePatches.boardStateSimple = "$servers/$simple/$statSimpleData/$data"
+        FirebasePatches.boardStateSuper = "$servers/$superr/$statSuperData/$data"
+        FirebasePatches.winSuper = "$servers/$superr/$statSuperData/$winPositionData"
+        FirebasePatches.exitCodeSuper = "$servers/$superr/$statSuperData/$exitCodeData"
+        FirebasePatches.exitCodeSimple = "$servers/$simple/$statSimpleData/$exitCodeData"
+        FirebasePatches.setupFirebaseListener = "$servers/$simple/$statSimpleData/$data"
+        FirebasePatches.refSimple = "$servers/$simple/$statSimpleData"
+        FirebasePatches.refSuper = "$servers/$superr/$statSuperData"
+        FirebasePatches.prevStep = prevStepData
+    }
     object ServersSimple {
         private val firebaseService = FirebaseService()
 
@@ -149,21 +256,12 @@ class Servers {
     fun waitingPlayer(patch: String, codeActivity: Int, getNum: Int, callback: (Boolean) -> Unit) {
         if (codeActivity == 0) {
             firebaseService.getPlayersNumSimple2(patch) {
-                if (it == null){
-                    println("ldkmv")
-                }else {
-                    callback(it == 2)
-                }
+                callback(it == 2)
             }
         } else {
             firebaseService.getPlayersNumSuper(patch) {
-                if (it == null){
-                    println("ldkmv")
-                }else {
-                    callback(it == 2)
-                }
+                callback(it == 2)
             }
         }
     }
-
 }

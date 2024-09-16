@@ -25,7 +25,6 @@ class SimpleTicTacToe : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance()
     private var firebaseListener: ValueEventListener? = null
     private val servers = Servers()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySimpleTicTacToeBinding.inflate(layoutInflater)
@@ -227,21 +226,17 @@ class SimpleTicTacToe : AppCompatActivity() {
         initialization()
     }
     private fun replaceFragment(fragment: DialogFragment) {
-        // Перевірка чи активність не знищена і не завершується
         if (!isFinishing && !supportFragmentManager.isDestroyed) {
             val fragmentTransaction = supportFragmentManager.beginTransaction()
 
-            // Перевірка чи транзакція безпечна (стан активності не був збережений)
             if (!supportFragmentManager.isStateSaved) {
                 fragmentTransaction.replace(binding.fragmentContainerView3.id, fragment)
                 fragmentTransaction.commit()
             } else {
-                // Якщо стан активності був збережений, використовуйте commitAllowingStateLoss
                 fragmentTransaction.replace(binding.fragmentContainerView3.id, fragment)
                 fragmentTransaction.commitAllowingStateLoss()
             }
         } else {
-            // Логування або інші дії, якщо транзакція не може бути виконана
             println("Замінити фрагмент неможливо: активність знищена або завершується")
         }
     }
