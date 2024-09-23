@@ -1,18 +1,14 @@
-package com.exemple.ticktacktoe
+package com.exemple.ticktacktoe.Game.Offline
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import com.exemple.ticktacktoe.Game.MainActivity
+import com.exemple.ticktacktoe.GameBoard
+import com.exemple.ticktacktoe.R
 import com.exemple.ticktacktoe.databinding.ActivitySimpleTicTacToeBinding
-import com.exemple.ticktacktoe.Game.FirebaseService
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.ValueEventListener
 
 class OfflineSimple : AppCompatActivity() {
 

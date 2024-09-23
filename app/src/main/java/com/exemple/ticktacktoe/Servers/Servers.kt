@@ -1,8 +1,8 @@
-package com.exemple.ticktacktoe
+package com.exemple.ticktacktoe.Servers
 
 import android.util.Log
-import com.exemple.ticktacktoe.Game.FirebaseService
-import kotlin.random.Random
+import com.exemple.ticktacktoe.Firebase.FirebasePatches
+import com.exemple.ticktacktoe.Firebase.FirebaseService
 
 
 class Servers {
@@ -72,7 +72,7 @@ class Servers {
             callback(it, type)
         }
     }
-    fun createRoom(random: Int) {
+    fun createRoom(random: String) {
 
         var servers = "Servers"             ////////
         val room = "rooms"
@@ -244,10 +244,10 @@ class Servers {
         fun serverIsStarting(patch: String, it: Int): Boolean{
             var result = false
             result = if (it == 0 || it == 1){
-                ServersSuper.firebaseService.setPlayersNumSuper(it + 1, patch)
+                firebaseService.setPlayersNumSuper(it + 1, patch)
                 true
             }else {
-                ServersSuper.rightServer(it)
+                rightServer(it)
                 true
             }
             return result

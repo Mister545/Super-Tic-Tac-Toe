@@ -1,7 +1,6 @@
-package com.exemple.ticktacktoe.Game
+package com.exemple.ticktacktoe.Firebase
 
 import android.util.Log
-import com.exemple.ticktacktoe.FirebasePatches
 import com.google.firebase.database.*
 
 class FirebaseService {
@@ -10,8 +9,8 @@ class FirebaseService {
     private val database = FirebaseDatabase.getInstance()
 
     fun removeListener(path: String, listener: ValueEventListener) {
-    val databaseReference = database.getReference(path)
-    databaseReference.removeEventListener(listener)
+        val databaseReference = database.getReference(path)
+        databaseReference.removeEventListener(listener)
 }
 
     fun setUserName(path: String, userUid: String, name: String?){
@@ -151,6 +150,33 @@ fun getExitCode(path: String, callback: (Int) -> Unit): ValueEventListener {
             }
         })
     }
+
+    fun getListSuperServers(callback: (MutableList<SuperModel.ServerSuper>) -> Unit) {
+        val databaseReference = database.getReference("Servers/super")
+
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val serverList = mutableListOf<SuperModel.ServerSuper>()
+                for (serverSnapshot in snapshot.children) {
+                    // Дістаємо дані та перетворюємо їх у об'єкти ServerSuper
+                    val server = serverSnapshot.getValue(SuperModel.ServerSuper::class.java)
+                    server?.let {
+                        serverList.add(it) // Додаємо до списку, якщо об'єкт не null
+                    }
+                    callback(serverList)
+                }
+
+                Log.d("ooo", "Отримані дані: $serverList")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("FirebaseData", "Помилка зчитування: ${error.message}")
+            }
+        })
+    }
+
+
+
     fun getPlayersNumSimpleEvent(path: String, callback: (Int) -> Unit): ValueEventListener {
         val firebaseListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -209,6 +235,21 @@ fun getExitCode(path: String, callback: (Int) -> Unit): ValueEventListener {
 
             override fun onCancelled(error: DatabaseError) {
                 println("Помилка зчитування з Firebase: ${error.message}")
+            }
+        })
+    }
+
+    fun getAllBase(callback: (SuperModel.Servers) -> Unit) {
+        val databaseReference = database.getReference("Servers")
+
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val servers = dataSnapshot.getValue(SuperModel.Servers::class.java)
+                Log.d("ooo", servers.toString())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ooo", "Error: ${error.message}")
             }
         })
     }

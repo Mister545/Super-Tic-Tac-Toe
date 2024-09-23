@@ -1,4 +1,4 @@
-package com.exemple.ticktacktoe
+package com.exemple.ticktacktoe.Game.Online
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,17 @@ import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import com.exemple.ticktacktoe.DialogHelper.DialogHelper
+import com.exemple.ticktacktoe.Firebase.FirebasePatches
 import com.exemple.ticktacktoe.databinding.ActivitySimpleTicTacToeBinding
-import com.exemple.ticktacktoe.Game.FirebaseService
+import com.exemple.ticktacktoe.Firebase.FirebaseService
+import com.exemple.ticktacktoe.Game.ConstForActivity
+import com.exemple.ticktacktoe.Game.MainActivity
+import com.exemple.ticktacktoe.GameBoard
+import com.exemple.ticktacktoe.R
+import com.exemple.ticktacktoe.Servers.FragmentWaitingPlayers
+import com.exemple.ticktacktoe.Servers.FragmentWaitingPlayersRoom
+import com.exemple.ticktacktoe.Servers.Servers
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -16,12 +25,10 @@ import com.google.firebase.database.ValueEventListener
 
 class SimpleTicTacToe : AppCompatActivity() {
 
-
-
     private lateinit var binding: ActivitySimpleTicTacToeBinding
     private lateinit var buttonArr: List<Button>
     private val gameBoard = GameBoard()
-    val firebaseService = FirebaseService()
+    private val firebaseService = FirebaseService()
     private val database = FirebaseDatabase.getInstance()
     private var firebaseListener: ValueEventListener? = null
     private val servers = Servers()
@@ -29,6 +36,12 @@ class SimpleTicTacToe : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySimpleTicTacToeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        FragmentWaitingPlayers().apply {
+            arguments = Bundle().apply {
+                putString(ConstForActivity.SIMPLE_OR_SUPER.toString(), "simple")
+            }
+        }
 
         buttonArr = arrayListOf(
             binding.button1, binding.button2, binding.button3,
@@ -71,6 +84,7 @@ class SimpleTicTacToe : AppCompatActivity() {
         resetGame()
         setupFirebaseListener()  // Налаштування постійного слухача змін
     }
+
     private fun exitListeners() {
         firebaseService.getExitCode(FirebasePatches.exitCodeSimple) { code ->
             if (code == 1)
@@ -86,7 +100,8 @@ class SimpleTicTacToe : AppCompatActivity() {
         firebaseListener?.let {
             databaseReference.removeEventListener(it)
         }
-        database.getReference(FirebasePatches.playersNum).removeEventListener(firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum) {})
+        database.getReference(FirebasePatches.playersNum).removeEventListener(firebaseService.getPlayersNumSimpleEvent(
+            FirebasePatches.playersNum) {})
 
         val exitCodeListener: ValueEventListener? = null
 
@@ -127,8 +142,13 @@ class SimpleTicTacToe : AppCompatActivity() {
         firebaseService.getPlayersNumSimpleEvent(FirebasePatches.playersNum) {
             val isWaitingPlayer = servers.waitingPlayer(FirebasePatches.playersNum, 0, 0){
                 if (!it) {
-                    replaceFragment(FragmentWaitingPlayersSimple())
-                    disableAllButtons()
+                    val value = intent.getStringExtra(ConstForActivity.ROOM_CODE.toString())
+                    if (value == "true"){
+                        replaceFragment(FragmentWaitingPlayersRoom())
+                    } else {
+                        replaceFragment(FragmentWaitingPlayers())
+                    }
+//                    disableAllButtons()
                 } else {
                     removeFragment()
                     enableAllButtons()
@@ -177,9 +197,9 @@ class SimpleTicTacToe : AppCompatActivity() {
                 val boardState = dataSnapshot.getValue(t) ?: MutableList(9) { 0 }
                 updateUI(boardState)
                 when {
-                    gameBoard.checkWin(1, boardState) -> binding.TicTacToeText.text = "Winner X"
-                    gameBoard.checkWin(2, boardState) -> binding.TicTacToeText.text = "Winner O"
-                    gameBoard.isDraw(boardState) -> binding.TicTacToeText.text = "Draw"
+                    gameBoard.checkWin(1, boardState) -> DialogHelper().createWinDialogSimple("X", this@SimpleTicTacToe)
+                    gameBoard.checkWin(2, boardState) -> DialogHelper().createWinDialogSimple("O", this@SimpleTicTacToe)
+                    gameBoard.isDraw(boardState) -> DialogHelper().createWinDialogSimple("Draw", this@SimpleTicTacToe)
                 }
             }
 

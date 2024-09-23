@@ -2,9 +2,9 @@ package com.exemple.desk.dialighelper.accounhelper
 
 import android.widget.Toast
 import com.exemple.ticktacktoe.Auth.GoogleAccConst
-import com.exemple.ticktacktoe.FirebasePatches
-import com.exemple.ticktacktoe.Game.FirebaseService
-import com.exemple.ticktacktoe.MainActivity
+import com.exemple.ticktacktoe.Firebase.FirebasePatches
+import com.exemple.ticktacktoe.Firebase.FirebaseService
+import com.exemple.ticktacktoe.Game.MainActivity
 import com.exemple.ticktacktoe.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,7 +23,8 @@ class AccountHelper(act: MainActivity) {
             act.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener{task->
 
                 if(task.isSuccessful){
-                    firebaseService.setUserName(FirebasePatches.users,
+                    firebaseService.setUserName(
+                        FirebasePatches.users,
                         mAuth.uid.toString(), name)
                     sendEmailVerification(task.result?.user!!)
                     act.uiUpdate(task.result?.user)
@@ -39,7 +40,8 @@ class AccountHelper(act: MainActivity) {
 
                 if(task.isSuccessful){
 
-                    firebaseService.setUserName(FirebasePatches.users,
+                    firebaseService.setUserName(
+                        FirebasePatches.users,
                         mAuth.uid.toString(), name)
                     act.uiUpdate(task.result?.user)
                 }else{

@@ -1,5 +1,6 @@
 package com.exemple.ticktacktoe
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.GradientDrawable
@@ -7,6 +8,7 @@ import android.util.TypedValue
 import android.widget.Button
 
 import androidx.core.content.ContextCompat
+import com.exemple.ticktacktoe.DialogHelper.DialogHelper
 import com.exemple.ticktacktoe.databinding.ActivitySuperTicTacToeBinding
 
 class GameBoard {
@@ -83,7 +85,7 @@ fun setStrokeOnButtonOn(button: Button, context: Context) {
         arrSimple[index] = player
     }
 
-    fun checkWinSuper(boardState: MutableList<MutableList<Int>>, binding: ActivitySuperTicTacToeBinding){
+    fun checkWinSuper(boardState: MutableList<MutableList<Int>>, binding: ActivitySuperTicTacToeBinding, activity: Activity){
         boardState.forEachIndexed { indexI, i ->
             when {
                 checkWin(1, i) -> winListSuper[indexI] = 1
@@ -91,9 +93,9 @@ fun setStrokeOnButtonOn(button: Button, context: Context) {
                 isDraw(i) -> winListSuper[indexI] = 3
             }
             when {
-                checkWin(1, winListSuper) -> binding.TextWin.text = "Win X"
-                checkWin(2, winListSuper) -> binding.TextWin.text = "Win O"
-                isDraw(winListSuper) -> binding.TextWin.text = "Draw"
+                checkWin(1, winListSuper) -> DialogHelper().createWinDialogSuper("X", activity)
+                checkWin(2, winListSuper) -> DialogHelper().createWinDialogSuper("O", activity)
+                isDraw(winListSuper) -> DialogHelper().createWinDialogSuper("Draw", activity)
             }
         }
     }
@@ -148,6 +150,17 @@ fun setStrokeOnButtonOn(button: Button, context: Context) {
             condition.all { array[it] == player }
         }
     }
+    fun checkWin(player: Int, array: MutableList<Int>, activity: Activity): Boolean {
+        val winConditions = arrayOf(
+            intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
+            intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
+            intArrayOf(0, 4, 8), intArrayOf(2, 4, 6)
+        )
+        val result: Boolean = winConditions.any { condition ->
+            condition.all { array[it] == player }
+        }
+            return result
+    }
 
     fun checkWinSuper(player: Int, array: MutableList<Int>): Boolean {
         val winConditions = arrayOf(
@@ -164,4 +177,3 @@ fun setStrokeOnButtonOn(button: Button, context: Context) {
         return array.all { it != 0 }
     }
 }
-

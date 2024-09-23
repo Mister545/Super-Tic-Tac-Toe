@@ -1,4 +1,4 @@
-package com.exemple.ticktacktoe
+package com.exemple.ticktacktoe.Firebase
 
 object FirebasePatches {
 
@@ -8,7 +8,7 @@ object FirebasePatches {
     val codeRoom = "0000000"
 
     var signInRoom = "$servers/$room/$codeRoom"
-    var usersDataName = "${users}/name"
+    var usersDataName = "$users/name"
 
     val rooms = "$servers/$room"
 
