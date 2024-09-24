@@ -10,18 +10,6 @@ class SuperModel {
         var playersNum: Int? = null
     )
 
-    data class Simple(
-        var serverSimple: ServerSimple? = null
-    )
-
-    data class Super(
-        var serverSimple: ServerSuper? = null
-    )
-
-    data class Room(
-        var serverSimple: ServerSimple? = null
-    )
-
     data class ServerSuper(
         var ExitCode: Int? = null,
         var data: MutableList<MutableList<Int>>? = null,

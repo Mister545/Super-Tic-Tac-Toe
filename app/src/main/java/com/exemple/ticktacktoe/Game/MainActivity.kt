@@ -36,10 +36,28 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val a = fun(){
+            Log.d("ooo", "dkjvuhdvgyvgydfvdybcudubc")
+        }
+
+        a()
+
 //        firebaseService.getAllBase {
 //
 //        }
-        firebaseService.getListSupers()
+        firebaseService.getListServers("Simple"){
+
+        }
+        firebaseService.getListServers("Super"){
+
+        }
+        firebaseService.getListServers("RoomSimple"){
+
+        }
+        firebaseService.getListServers("RoomSuper"){
+
+        }
+
 //        binding.imageButtonAccount.setOnClickListener {
 //            if (mAuth.currentUser != null){
 //                val intent = Intent(this, SuperTicTacToe::class.java)

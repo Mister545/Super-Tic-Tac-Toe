@@ -151,17 +151,41 @@ fun getExitCode(path: String, callback: (Int) -> Unit): ValueEventListener {
         })
     }
 
-    fun getListSuperServers(callback: (MutableList<SuperModel.ServerSuper>) -> Unit) {
-        val databaseReference = database.getReference("Servers/super")
+    fun getListServers(typeGame: String, callback: (MutableList<Any>) -> Unit) {
 
-        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+        var newPath = ""
+        val model: Any
+
+        when (typeGame) {
+            "Super" -> {
+                newPath = "Servers/super"
+                model = SuperModel.ServerSuper()
+            }
+            "RoomSuper" -> {
+                newPath = "Servers/rooms/superr"
+                model = SuperModel.ServerSuper()
+            }
+            "Simple" -> {
+                newPath = "Servers/simple"
+                model = SuperModel.ServerSimple()
+            }
+            "RoomSimple" -> {
+                newPath = "Servers/rooms/simple"
+                model = SuperModel.ServerSimple()
+            }
+            else -> model = SuperModel.ServerSuper()
+        }
+
+        Log.d("ooo", "modellllllll $model")
+        val databaseReference = database.getReference(newPath)
+
+        databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val serverList = mutableListOf<SuperModel.ServerSuper>()
+                val serverList = mutableListOf<Any>()
                 for (serverSnapshot in snapshot.children) {
-                    // Дістаємо дані та перетворюємо їх у об'єкти ServerSuper
-                    val server = serverSnapshot.getValue(SuperModel.ServerSuper::class.java)
+                    val server = serverSnapshot.getValue(model::class.java)
                     server?.let {
-                        serverList.add(it) // Додаємо до списку, якщо об'єкт не null
+                        serverList.add(it)
                     }
                     callback(serverList)
                 }
@@ -174,8 +198,6 @@ fun getExitCode(path: String, callback: (Int) -> Unit): ValueEventListener {
             }
         })
     }
-
-
 
     fun getPlayersNumSimpleEvent(path: String, callback: (Int) -> Unit): ValueEventListener {
         val firebaseListener = object : ValueEventListener {
